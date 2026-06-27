@@ -5,6 +5,33 @@ import { submitExamSchema } from "../validators/exam.validator";
 import type { AuthenticatedRequest } from "../types/express";
 
 export class ExamController {
+  static async list(req: Request, res: Response) {
+    const authUser = (req as AuthenticatedRequest).authUser!;
+    const result = await ExamService.getExamsForUser(authUser.role, authUser.department);
+    res.status(StatusCodes.OK).json({
+      success: true,
+      data: result
+    });
+  }
+
+  static async getMyResults(req: Request, res: Response) {
+    const authUser = (req as AuthenticatedRequest).authUser!;
+    const result = await ExamService.getMyResults(authUser.userId);
+    res.status(StatusCodes.OK).json({
+      success: true,
+      data: result
+    });
+  }
+
+  static async getDetail(req: Request, res: Response) {
+    const examId = Number(req.params.examId);
+    const result = await ExamService.getExamForTaking(examId);
+    res.status(StatusCodes.OK).json({
+      success: true,
+      data: result
+    });
+  }
+
   static async submit(req: Request, res: Response) {
     const examId = Number(req.params.examId);
     const payload = submitExamSchema.parse(req.body);

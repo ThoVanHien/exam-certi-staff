@@ -132,17 +132,17 @@
 :host ::ng-deep .field-control.p-inputtext:enabled:hover,
 :host ::ng-deep .password-control .p-inputtext:hover,
 :host ::ng-deep .password-control .p-inputtext:enabled:hover {
-  border-color: rgba(38, 178, 242, 0.44);
-  background: rgba(37, 44, 55, 0.92);
-  color: var(--color-text-primary);
+  border-color: rgba(38, 178, 242, 0.44) !important;
+  background: rgba(37, 44, 55, 0.92) !important;
+  color: var(--color-text-primary) !important;
 }
 
 :host ::ng-deep .field-control.p-inputtext:focus,
 :host ::ng-deep .password-control .p-inputtext:focus {
-  border-color: var(--color-border-muted);
-  background: rgba(37, 44, 55, 0.92);
-  color: var(--color-text-primary);
-  box-shadow: 0 0 0 3px rgba(38, 178, 242, 0.2);
+  border-color: var(--color-border-muted) !important;
+  background: rgba(37, 44, 55, 0.92) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: 0 0 0 3px rgba(38, 178, 242, 0.2) !important;
 }
 
 :host ::ng-deep .password-control {

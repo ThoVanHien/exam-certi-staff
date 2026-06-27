@@ -26,7 +26,274 @@
         [userRole]="auth().user.role"
       />
     } @else if (selectedSection() === 'examinations') {
-      <app-exam-overview [exams]="exams()" [userRole]="auth().user.role" />
+      <app-exam-overview
+        [exams]="exams()"
+        [userRole]="auth().user.role"
+        (startExam)="startExam.emit($event)"
+      />
+    } @else if (selectedSection() === 'take-exam') {
+      <app-exam-taking
+        [examId]="activeExamId()!"
+        [authSession]="auth()"
+        [apiBaseUrl]="'http://localhost:3000/api'"
+        (finished)="finishExam.emit()"
+      />
+    } @else if (selectedSection() === 'results') {
+      <p-card styleClass="table-card">
+        <div class="table-card__head">
+          <h2>Lịch sử kết quả thi của tôi</h2>
+          <p>Xem lại điểm số, số câu đúng và trạng thái đạt/chưa đạt của các bài thi đã làm.</p>
+        </div>
+
+        <p-table
+          [value]="results()"
+          styleClass="exam-table"
+          [tableStyle]="{ 'min-width': '50rem' }"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Mã bài thi</th>
+              <th>Tên bài thi</th>
+              <th>Điểm số</th>
+              <th>Số câu đúng</th>
+              <th>Trạng thái</th>
+              <th>Thời gian nộp</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-res>
+            <tr>
+              <td><span class="exam-code">{{ res.exam?.code || 'EX-' + res.exam?.id }}</span></td>
+              <td><strong>{{ res.exam?.title }}</strong></td>
+              <td><span class="font-bold text-primary">{{ res.score }}%</span></td>
+              <td>{{ res.correctAnswers }}/{{ res.exam?.totalQuestions || res.answeredQuestions }}</td>
+              <td>
+                <p-tag
+                  [value]="res.status === 'passed' ? 'ĐẠT' : 'CHƯA ĐẠT'"
+                  [severity]="res.status === 'passed' ? 'success' : 'danger'"
+                />
+              </td>
+              <td>{{ res.completedAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">Bạn chưa tham gia bài thi nào.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    } @else if (selectedSection() === 'certificates') {
+      <div class="certificates-container">
+        @if (auth().user.role === 'employee') {
+          @if (passedResults().length === 0) {
+            <p-card styleClass="empty-certificates-card">
+              <div class="empty-state">
+                <div class="empty-icon-wrapper">
+                  <i class="pi pi-bookmark text-4xl text-muted"></i>
+                </div>
+                <h3>Chưa có chứng chỉ nào được cấp</h3>
+                <p>Bạn cần hoàn thành xuất sắc bài kiểm tra (đạt từ 70% trở lên) để được cấp chứng chỉ tương ứng.</p>
+                <p-button label="Xem danh sách bài thi" icon="pi pi-arrow-left" (click)="onNavigate('examinations')" />
+              </div>
+            </p-card>
+          } @else {
+            <!-- Selector & Print buttons -->
+            <div class="certificate-toolbar no-print">
+              <div class="toolbar-left">
+                <label for="cert-select" class="font-bold text-sm">Chọn chứng chỉ:</label>
+                <select
+                  id="cert-select"
+                  class="cert-dropdown"
+                  [value]="selectedCertificateIndex()"
+                  (change)="onSelectCertificate($event)"
+                >
+                  @for (c of passedResults(); track c.id; let idx = $index) {
+                    <option [value]="idx">{{ c.exam?.title }} ({{ c.score }}%)</option>
+                  }
+                </select>
+              </div>
+              <div class="toolbar-right">
+                <button class="print-btn" (click)="printCertificate()">
+                  <i class="pi pi-print mr-2"></i> In chứng chỉ
+                </button>
+              </div>
+            </div>
+
+            <!-- Printable Certificate Template -->
+            <div class="certificate-frame-wrapper">
+              <div
+                class="certificate-template"
+                [style.background-image]="certTemplate()?.exists ? 'url(' + certTemplate()?.url + ')' : 'none'"
+                [style.background-size]="certTemplate()?.exists ? 'cover' : 'auto'"
+                id="certificate-print-area"
+              >
+                <div class="cert-border-outer" [style.border-color]="certTemplate()?.exists ? 'transparent' : '#b8860b'">
+                  <div
+                    class="cert-border-inner"
+                    [style.border-color]="certTemplate()?.exists ? 'transparent' : '#d4af37'"
+                    [style.background-image]="certTemplate()?.exists ? 'none' : 'radial-gradient(circle, rgba(253,252,247,0) 0%, rgba(245,242,228,0.5) 100%)'"
+                  >
+                    <!-- Corner decorations -->
+                    @if (!certTemplate()?.exists) {
+                      <div class="cert-corner top-left"></div>
+                      <div class="cert-corner top-right"></div>
+                      <div class="cert-corner bottom-left"></div>
+                      <div class="cert-corner bottom-right"></div>
+                    }
+
+                    <!-- Certificate content -->
+                    <div class="cert-content">
+                      <div class="cert-header" [style.visibility]="certTemplate()?.exists ? 'hidden' : 'visible'">
+                        <div class="cert-badge-logo">
+                          <i class="pi pi-verified"></i>
+                        </div>
+                        <span class="cert-org">ECEP STAFF ASSESSMENT PORTAL</span>
+                      </div>
+
+                      <h1 class="cert-title" [style.visibility]="certTemplate()?.exists ? 'hidden' : 'visible'">CHỨNG CHỈ HOÀN THÀNH</h1>
+                      <p class="cert-subtitle" [style.visibility]="certTemplate()?.exists ? 'hidden' : 'visible'">Chứng chỉ này ghi nhận rằng</p>
+
+                      <!-- recipient name is always visible and positioned beautifully -->
+                      <h2 class="cert-recipient-name" [style.margin-top]="certTemplate()?.exists ? '120px' : '8px'">{{ auth().user.name | uppercase }}</h2>
+
+                      <div class="cert-divider" [style.visibility]="certTemplate()?.exists ? 'hidden' : 'visible'">
+                        <span class="divider-line"></span>
+                        <span class="divider-star"><i class="pi pi-star-fill"></i></span>
+                        <span class="divider-line"></span>
+                      </div>
+
+                      <p class="cert-achievement-text" [style.visibility]="certTemplate()?.exists ? 'hidden' : 'visible'">
+                        Đã hoàn thành xuất sắc kỳ thi đánh giá năng lực nghiệp vụ chuyên môn
+                      </p>
+
+                      <!-- exam title is always visible and positioned beautifully -->
+                      <h3 class="cert-exam-title">{{ activeCertificate()?.exam?.title }}</h3>
+
+                      <!-- meta info is always visible -->
+                      <div class="cert-meta-info">
+                        <div class="meta-item">
+                          <span class="meta-label">Điểm số đạt</span>
+                          <span class="meta-val highlight">{{ activeCertificate()?.score }}%</span>
+                        </div>
+                        <div class="meta-item">
+                          <span class="meta-label">Mã chứng nhận</span>
+                          <span class="meta-val">#ECEP-CERT-{{ activeCertificate()?.id }}</span>
+                        </div>
+                        <div class="meta-item">
+                          <span class="meta-label">Ngày cấp</span>
+                          <span class="meta-val">{{ activeCertificate()?.completedAt | date: 'dd/MM/yyyy' }}</span>
+                        </div>
+                      </div>
+
+                      <!-- Signatures Section is always visible -->
+                      <div class="cert-footer">
+                        <div class="signature-block">
+                          <div class="signature-line" [style.border-color]="certTemplate()?.exists ? 'transparent' : '#cbd5e1'">
+                            <!-- Simulated SVG signature -->
+                            <svg viewBox="0 0 100 40" class="sim-signature">
+                              <path d="M 10 30 Q 30 10 50 30 T 90 20" fill="none" stroke="#2563eb" stroke-width="2" />
+                              <path d="M 20 20 Q 50 5 80 25" fill="none" stroke="#2563eb" stroke-width="1.5" />
+                            </svg>
+                          </div>
+                          <span class="signer-role">Giám đốc Đào tạo</span>
+                          <strong class="signer-name">Trần Quốc Bảo</strong>
+                        </div>
+
+                        <!-- Central Seal Badge -->
+                        <div class="cert-seal" [style.visibility]="certTemplate()?.exists ? 'hidden' : 'visible'">
+                          <div class="seal-inner">
+                            <i class="pi pi-verified"></i>
+                            <span>PASSED</span>
+                          </div>
+                          <div class="ribbon-left"></div>
+                          <div class="ribbon-right"></div>
+                        </div>
+
+                        <div class="signature-block">
+                          <div class="signature-line" [style.border-color]="certTemplate()?.exists ? 'transparent' : '#cbd5e1'">
+                            <!-- Simulated SVG signature 2 -->
+                            <svg viewBox="0 0 100 40" class="sim-signature">
+                              <path d="M 15 25 C 30 5 60 40 85 20" fill="none" stroke="#1d4ed8" stroke-width="2" />
+                            </svg>
+                          </div>
+                          <span class="signer-role">Phụ trách đánh giá</span>
+                          <strong class="signer-name">Nguyễn Minh Quân</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        } @else {
+          <!-- Administrative view: Manage template background -->
+          <p-card styleClass="table-card">
+            <div class="table-card__head">
+              <h2>Quản lý phôi chứng chỉ (Certificate Template)</h2>
+              <p>Tải lên tệp ảnh nền phôi chứng chỉ của hệ thống. Nhân viên sau khi thi đỗ sẽ được ghép thông tin tự động lên phôi này.</p>
+            </div>
+
+            <div class="template-management-box">
+              <div class="template-preview-area">
+                @if (certTemplate()?.exists) {
+                  <div class="preview-frame">
+                    <img [src]="certTemplate()?.url" alt="Certificate Template Background" class="template-image-preview" />
+                    <div class="preview-overlay-info">
+                      <span class="preview-badge"><i class="pi pi-check-circle mr-1"></i> Đang hoạt động</span>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="preview-placeholder">
+                    <i class="pi pi-images text-6xl text-muted mb-4"></i>
+                    <p class="font-bold">Chưa có phôi chứng chỉ nào được tải lên</p>
+                    <p class="text-sm text-secondary">Hệ thống đang sử dụng khung viền cổ điển mặc định.</p>
+                  </div>
+                }
+              </div>
+
+              <div class="template-upload-actions">
+                <div class="upload-zone">
+                  <label 
+                    for="template-upload-input" 
+                    class="upload-btn" 
+                    [class.upload-btn--loading]="isUploadingTemplate()"
+                    [style.pointer-events]="isUploadingTemplate() ? 'none' : 'auto'"
+                    [style.opacity]="isUploadingTemplate() ? '0.7' : '1'"
+                  >
+                    @if (isUploadingTemplate()) {
+                      <i class="pi pi-spinner pi-spin mr-2"></i> Đang tải lên...
+                    } @else {
+                      <i class="pi pi-upload mr-2"></i> Tải lên phôi mới (PNG/JPG)
+                    }
+                  </label>
+                  <input
+                    type="file"
+                    id="template-upload-input"
+                    accept="image/png, image/jpeg, image/jpg"
+                    style="display: none;"
+                    (change)="onTemplateFileSelected($event)"
+                    [disabled]="isUploadingTemplate()"
+                  />
+                  @if (isUploadingTemplate()) {
+                    <p-progressBar mode="indeterminate" styleClass="mt-3 h-2rem border-round"></p-progressBar>
+                  }
+                </div>
+                <div class="template-tips">
+                  <h4>💡 Hướng dẫn định dạng phôi:</h4>
+                  <ul>
+                    <li>Kích thước chuẩn: <strong>840 x 594 pixel</strong> (tỷ lệ khổ ngang A4).</li>
+                    <li>Nên để trống phần thông tin chính giữa để hệ thống tự động ghi đè họ tên nhân viên, tên kỳ thi, điểm số và ngày cấp.</li>
+                    <li>Khuyên dùng định dạng tệp <strong>.png</strong> chất lượng cao để đảm bảo độ rõ nét khi in.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </p-card>
+        }
+      </div>
     } @else {
       <app-employee-overview
         [employees]="employees()"

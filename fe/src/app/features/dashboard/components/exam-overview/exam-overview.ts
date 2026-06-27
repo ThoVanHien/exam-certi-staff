@@ -1,14 +1,16 @@
-import { Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ExamItem } from '../../../../core/models/dashboard.model';
+import { buildExamPreviewHtml, ExamPreviewAnswer, ExamPreviewQuestion } from './exam-preview.template';
+
 
 type ChoiceKey = 'A' | 'B' | 'C' | 'D';
 type EditorMode = 'list' | 'create' | 'edit';
@@ -48,7 +50,7 @@ interface ParsedPdfExam {
 
 @Component({
   selector: 'app-exam-overview',
-  imports: [FormsModule, CardModule, InputTextModule, SelectModule, ButtonModule, TableModule, TagModule, ConfirmPopupModule],
+  imports: [FormsModule, CardModule, InputTextModule, SelectModule, ButtonModule, TableModule, TagModule, ConfirmDialogModule],
   templateUrl: './exam-overview.html',
   styleUrl: './exam-overview.scss',
   providers: [ConfirmationService],
@@ -56,7 +58,13 @@ interface ParsedPdfExam {
 export class ExamOverviewComponent implements OnInit, OnDestroy {
   readonly exams = input.required<ExamItem[]>();
   readonly userRole = input.required<string>();
+  readonly startExam = output<number>();
   private readonly confirmationService = inject(ConfirmationService);
+
+  protected onStartExam(item: ExamItem): void {
+    console.log('ExamOverviewComponent: onStartExam called for exam', item.id);
+    this.startExam.emit(item.id);
+  }
 
   protected readonly rowsPerPageOptions = [5, 10, 20];
   protected draftKeyword = '';
@@ -413,15 +421,15 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
   }
 
   protected confirmDeleteExam(event: Event, item: ExamItem): void {
+    event.stopPropagation();
     this.confirmationService.confirm({
-      target: event.currentTarget as HTMLElement,
-      message: `Delete "${item.title}" from the current local list?`,
-      header: 'Confirm deletion',
+      message: `Bạn có chắc muốn xóa đề thi "${item.title}" khỏi danh sách?`,
+      header: 'Xác nhận xóa',
       icon: 'pi pi-trash',
-      acceptLabel: 'Delete',
-      rejectLabel: 'Cancel',
-      acceptButtonStyleClass: 'danger-confirm-btn',
-      rejectButtonStyleClass: 'ghost-confirm-btn',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
       accept: () => this.deleteExam(item),
     });
   }
@@ -988,12 +996,24 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const lines = this.buildPdfLines(draft, item);
-    const blob = this.createPdfBlob(lines);
-    const url = URL.createObjectURL(blob);
+    const previewDraft = {
+      description: draft.description,
+      questions: draft.questions.map((q): ExamPreviewQuestion => ({
+        prompt: q.prompt,
+        imagePreview: q.imagePreview,
+        correctAnswer: q.correctAnswer,
+        answers: q.answers.map((a): ExamPreviewAnswer => ({
+          key: a.key,
+          text: a.text,
+          imagePreview: a.imagePreview,
+        })),
+      })),
+    };
 
-    previewWindow.location.href = url;
-    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    const html = buildExamPreviewHtml(previewDraft, item);
+    previewWindow.document.open();
+    previewWindow.document.write(html);
+    previewWindow.document.close();
   }
 
   ngOnInit(): void {
@@ -1005,141 +1025,7 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
     window.removeEventListener('hashchange', this.handleHashChange);
   }
 
-  private buildPdfLines(draft: ExamDraft, item: ExamItem): string[] {
-    const lines = [
-      'SEHC Examination Preview',
-      '',
-      `Exam code: ${item.code}`,
-      `Title: ${item.title}`,
-      `Department: ${item.department}`,
-      `Status: ${item.status}`,
-      `Question count: ${draft.questions.length}`,
-      '',
-      'Description:',
-      draft.description || item.description || 'No description provided.',
-      '',
-      'Questions:',
-      '',
-    ];
 
-    draft.questions.forEach((question, index) => {
-      lines.push(`${index + 1}. ${question.prompt || 'Question prompt not entered yet.'}`);
-      lines.push(`Correct answer: ${question.correctAnswer}`);
-
-      if (question.imageName) {
-        lines.push(`Question image: ${question.imageName}`);
-      }
-
-      question.answers.forEach((answer) => {
-        lines.push(`  ${answer.key}. ${answer.text || 'Answer text not entered yet.'}`);
-        if (answer.imageName) {
-          lines.push(`    Image: ${answer.imageName}`);
-        }
-      });
-
-      lines.push('');
-    });
-
-    return lines;
-  }
-
-  private createPdfBlob(lines: string[]): Blob {
-    const wrappedLines = lines.flatMap((line) => this.wrapLine(line, 90));
-    const linesPerPage = 40;
-    const pages: string[][] = [];
-
-    for (let index = 0; index < wrappedLines.length; index += linesPerPage) {
-      pages.push(wrappedLines.slice(index, index + linesPerPage));
-    }
-
-    const objects: string[] = [];
-    const catalogId = 1;
-    const pagesId = 2;
-    const pageObjectIds: number[] = [];
-
-    pages.forEach((_, index) => {
-      pageObjectIds.push(3 + index * 2);
-    });
-
-    const fontId = 3 + pages.length * 2;
-    objects[catalogId] = `<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
-    objects[pagesId] = `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pages.length} >>`;
-
-    pages.forEach((pageLines, index) => {
-      const pageId = pageObjectIds[index];
-      const contentId = pageId + 1;
-      const stream = this.createPageStream(pageLines);
-
-      objects[pageId] =
-        `<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 612 792] ` +
-        `/Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentId} 0 R >>`;
-      objects[contentId] = `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;
-    });
-
-    objects[fontId] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
-
-    let pdf = '%PDF-1.4\n';
-    const offsets: number[] = [];
-
-    for (let id = 1; id < objects.length; id += 1) {
-      if (!objects[id]) {
-        continue;
-      }
-
-      offsets[id] = pdf.length;
-      pdf += `${id} 0 obj\n${objects[id]}\nendobj\n`;
-    }
-
-    const xrefStart = pdf.length;
-    pdf += `xref\n0 ${objects.length}\n`;
-    pdf += '0000000000 65535 f \n';
-
-    for (let id = 1; id < objects.length; id += 1) {
-      const offset = offsets[id] ?? 0;
-      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
-    }
-
-    pdf += `trailer\n<< /Size ${objects.length} /Root ${catalogId} 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
-
-    return new Blob([pdf], { type: 'application/pdf' });
-  }
-
-  private createPageStream(lines: string[]): string {
-    const escapedLines = lines.map((line) => this.escapePdfText(line));
-    return ['BT', '/F1 12 Tf', '14 TL', '50 760 Td', ...escapedLines.map((line) => `(${line}) Tj T*`), 'ET'].join('\n');
-  }
-
-  private wrapLine(line: string, maxLength: number): string[] {
-    if (line.length <= maxLength) {
-      return [line];
-    }
-
-    const words = line.split(' ');
-    const result: string[] = [];
-    let currentLine = '';
-
-    words.forEach((word) => {
-      const nextLine = currentLine ? `${currentLine} ${word}` : word;
-      if (nextLine.length <= maxLength) {
-        currentLine = nextLine;
-      } else {
-        if (currentLine) {
-          result.push(currentLine);
-        }
-        currentLine = word;
-      }
-    });
-
-    if (currentLine) {
-      result.push(currentLine);
-    }
-
-    return result;
-  }
-
-  private escapePdfText(value: string): string {
-    return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
-  }
 
   private readFileAsDataUrl(file: File): Promise<string> {
     return new Promise((resolve, reject) => {

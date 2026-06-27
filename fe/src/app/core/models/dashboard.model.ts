@@ -1,4 +1,4 @@
-export type DashboardSection = 'employees' | 'examinations' | 'certificates' | 'results';
+export type DashboardSection = 'employees' | 'examinations' | 'certificates' | 'results' | 'take-exam';
 
 export interface EmployeeItem {
   id: string;

@@ -14,4 +14,19 @@ certificateRouter.post(
   asyncHandler(CertificateController.upload)
 );
 
+// Get template certificate
+certificateRouter.get(
+  "/template",
+  asyncHandler(authenticate),
+  asyncHandler(CertificateController.getTemplate)
+);
+
+// Upload template certificate
+certificateRouter.post(
+  "/template",
+  asyncHandler(authenticate),
+  certificateUpload.single("file"),
+  asyncHandler(CertificateController.uploadTemplate)
+);
+
 export { certificateRouter };

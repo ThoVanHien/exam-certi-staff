@@ -11,6 +11,9 @@
       [selectedSection]="selectedSection()"
       [employees]="visibleEmployees"
       [exams]="visibleExams"
+      [results]="myResults()"
+      [certTemplate]="certTemplate()"
+      [isUploadingTemplate]="isUploadingTemplate()"
       [pageTitle]="pageTitle"
       [pageSubtitle]="pageSubtitle"
       [passedCount]="passedCount"
@@ -18,10 +21,14 @@
       [retakeCount]="retakeCount"
       [currentTheme]="currentTheme()"
       [isSidebarCollapsed]="isSidebarCollapsed()"
+      [activeExamId]="activeExamId()"
       (themeChange)="setTheme($event)"
       (toggleSidebar)="toggleSidebar()"
       (navigate)="setSection($event)"
+      (uploadTemplate)="uploadTemplateFile($event)"
       (logout)="logout()"
+      (startExam)="startExam($event)"
+      (finishExam)="finishExam()"
     />
   } @else {
     <app-login-panel

@@ -24,19 +24,118 @@ export class App {
   protected readonly errorMessage = signal('');
   protected readonly loginResult = signal<LoginResponse['data'] | null>(null);
   protected readonly selectedSection = signal<DashboardSection>('employees');
+  protected readonly backendExams = signal<any[]>([]);
+  protected readonly myResults = signal<any[]>([]);
+  protected readonly certTemplate = signal<{ exists: boolean; url?: string } | null>(null);
+  protected readonly isUploadingTemplate = signal(false);
+  protected readonly activeExamId = signal<number | null>(null);
   protected readonly employeeItems = employeeItems;
   protected readonly examItems = examItems;
-  protected readonly navigationItems = computed<NavItem[]>(() =>
-    navigationItems.map((item) => ({
-      ...item,
-      active: item.key === this.selectedSection(),
-    })),
-  );
+  protected readonly navigationItems = computed<NavItem[]>(() => {
+    const user = this.loginResult()?.user;
+    const isEmp = user?.role === 'employee';
+    return navigationItems
+      .filter((item) => !(isEmp && item.key === 'employees'))
+      .map((item) => {
+        let label = item.label;
+        let hint = item.hint;
+        if (isEmp) {
+          if (item.key === 'examinations') {
+            label = 'My Exams';
+            hint = 'Take assigned assessments';
+          } else if (item.key === 'certificates') {
+            label = 'My Certificates';
+            hint = 'View my certifications';
+          } else if (item.key === 'results') {
+            label = 'My Results';
+            hint = 'View my exam history';
+          }
+        }
+        return {
+          ...item,
+          label,
+          hint,
+          active: item.key === this.selectedSection(),
+        };
+      });
+  });
 
   protected readonly loginForm = this.fb.nonNullable.group({
     email: ['admin@company.local', [Validators.required, Validators.email]],
     password: ['admin', [Validators.required]],
   });
+
+  private loadExams(token: string): void {
+    this.http
+      .get<{ success: boolean; data: any[] }>(`${this.apiBaseUrl}/exams`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .subscribe({
+        next: (res) => {
+          this.backendExams.set(res.data || []);
+        },
+        error: () => {
+          this.backendExams.set([]);
+        },
+      });
+  }
+
+  private loadMyResults(token: string): void {
+    console.log('App: loadMyResults called with token', token ? 'PRESENT' : 'MISSING');
+    this.http
+      .get<{ success: boolean; data: any[] }>(`${this.apiBaseUrl}/exams/my-results`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .subscribe({
+        next: (res) => {
+          console.log('App: loadMyResults succeeded, results count:', res.data?.length, res.data);
+          this.myResults.set(res.data || []);
+        },
+        error: (err) => {
+          console.error('App: loadMyResults failed:', err);
+          this.myResults.set([]);
+        },
+      });
+  }
+
+  private loadCertTemplate(token: string): void {
+    this.http
+      .get<{ success: boolean; data: { exists: boolean; url?: string } }>(`${this.apiBaseUrl}/certificates/template`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .subscribe({
+        next: (res) => {
+          this.certTemplate.set(res.data);
+        },
+        error: () => {
+          this.certTemplate.set({ exists: false });
+        },
+      });
+  }
+
+  protected uploadTemplateFile(file: File): void {
+    const auth = this.loginResult();
+    if (!auth) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.isUploadingTemplate.set(true);
+    this.http
+      .post<{ success: boolean; data: { exists: boolean; url?: string } }>(`${this.apiBaseUrl}/certificates/template`, formData, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
+      .subscribe({
+        next: (res) => {
+          this.certTemplate.set(res.data);
+          this.isUploadingTemplate.set(false);
+        },
+        error: (err) => {
+          console.error('App: Upload template failed', err);
+          this.isUploadingTemplate.set(false);
+        },
+      });
+  }
 
   protected onSubmit(): void {
     if (this.loginForm.invalid || this.isSubmitting()) {
@@ -54,6 +153,14 @@ export class App {
         next: (response) => {
           this.loginResult.set(response.data);
           this.isSubmitting.set(false);
+          if (response.data.user.role === 'employee') {
+            this.selectedSection.set('examinations');
+          } else {
+            this.selectedSection.set('employees');
+          }
+          this.loadExams(response.data.accessToken);
+          this.loadMyResults(response.data.accessToken);
+          this.loadCertTemplate(response.data.accessToken);
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage.set(error.error?.message || 'Unable to sign in. Please try again.');
@@ -65,6 +172,10 @@ export class App {
   protected logout(): void {
     this.loginResult.set(null);
     this.errorMessage.set('');
+    this.backendExams.set([]);
+    this.myResults.set([]);
+    this.certTemplate.set(null);
+    this.activeExamId.set(null);
     this.loginForm.patchValue({ password: '' });
     this.currentTheme.set('dark');
     this.isSidebarCollapsed.set(false);
@@ -96,12 +207,36 @@ export class App {
       return [];
     }
 
+    const bExams: ExamItem[] = this.backendExams().map((e: any) => ({
+      id: e.id,
+      code: e.code || `EX-${String(e.id).padStart(3, '0')}`,
+      title: e.title,
+      description: e.description || 'No description provided.',
+      department: e.department || 'Production',
+      createdBy: e.createdByUser?.name || 'admin',
+      questionCount: e.totalQuestions || 0,
+      durationMinutes: e.duration || 30,
+      status: 'Published' as const,
+    }));
+
+    if (auth.user.role === 'employee') {
+      return bExams;
+    }
+
+    // Merge backend exams and local mock exams for admins/partleaders
+    const merged = [...bExams];
+    for (const mock of this.examItems) {
+      if (!merged.some((e) => e.id === mock.id || e.title === mock.title)) {
+        merged.push(mock);
+      }
+    }
+
     if (auth.user.role === 'super_admin') {
-      return this.examItems;
+      return merged;
     }
 
     if (auth.user.role === 'partleader') {
-      return this.examItems.filter((item) => item.department === auth.user.department);
+      return merged.filter((item) => item.department === auth.user.department);
     }
 
     return [];
@@ -114,7 +249,14 @@ export class App {
       return '';
     }
 
+    if (this.selectedSection() === 'take-exam') {
+      return 'Màn hình làm bài thi';
+    }
+
     if (this.selectedSection() === 'examinations') {
+      if (auth.user.role === 'employee') {
+        return 'Danh sách bài thi của tôi';
+      }
       return auth.user.role === 'super_admin' ? 'Examination Management' : `${auth.user.department} Examination Management`;
     }
 
@@ -132,7 +274,14 @@ export class App {
       return '';
     }
 
+    if (this.selectedSection() === 'take-exam') {
+      return 'Vui lòng đọc kỹ câu hỏi và chọn câu trả lời chính xác nhất. Hệ thống sẽ tự động nộp bài khi hết giờ.';
+    }
+
     if (this.selectedSection() === 'examinations') {
+      if (auth.user.role === 'employee') {
+        return 'Xem các kỳ thi chứng chỉ được chỉ định cho bộ phận của bạn và tiến hành thi trực tuyến.';
+      }
       return auth.user.role === 'super_admin'
         ? 'Search, review, and maintain examination definitions across all parts.'
         : `Search, review, and maintain examination definitions for the ${auth.user.department} part.`;
@@ -167,5 +316,34 @@ export class App {
 
   protected setSection(section: DashboardSection): void {
     this.selectedSection.set(section);
+    if (section === 'results') {
+      const auth = this.loginResult();
+      if (auth) {
+        this.loadMyResults(auth.accessToken);
+      }
+    } else if (section === 'certificates') {
+      const auth = this.loginResult();
+      if (auth) {
+        this.loadCertTemplate(auth.accessToken);
+      }
+    }
+  }
+
+  protected startExam(examId: number): void {
+    console.log('App: startExam called with examId', examId);
+    this.activeExamId.set(examId);
+    this.selectedSection.set('take-exam');
+    console.log('App: activeExamId is now', this.activeExamId(), 'selectedSection is now', this.selectedSection());
+  }
+
+  protected finishExam(): void {
+    this.activeExamId.set(null);
+    this.selectedSection.set('examinations');
+    const auth = this.loginResult();
+    if (auth) {
+      this.loadExams(auth.accessToken);
+      this.loadMyResults(auth.accessToken);
+      this.loadCertTemplate(auth.accessToken);
+    }
   }
 }

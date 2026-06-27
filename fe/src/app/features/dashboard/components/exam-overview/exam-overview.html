@@ -17,34 +17,46 @@
             />
             <span>{{ isImportingPdf() ? 'Importing...' : 'Import PDF / Image' }}</span>
           </label>
-          <p-button
-            icon="pi pi-arrow-left"
-            styleClass="reset-btn exam-icon-btn"
-            ariaLabel="Back to exams"
+          <button
+            type="button"
+            class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
             title="Back to exams"
-            (onClick)="returnToListPage()"
-          />
-          <p-button
-            icon="pi pi-file-pdf"
-            styleClass="reset-btn exam-icon-btn"
-            ariaLabel="Preview PDF"
+            aria-label="Back to exams"
+            (click)="returnToListPage()"
+            style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
+          >
+            <span class="p-button-icon pi pi-arrow-left" aria-hidden="true" style="color: var(--text-panel); font-size: 1rem;"></span>
+          </button>
+          <button
+            type="button"
+            class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
             title="Preview PDF"
-            (onClick)="previewCurrentDraftPdf()"
-          />
-          <p-button
-            icon="pi pi-save"
-            styleClass="reset-btn exam-icon-btn"
-            [ariaLabel]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
+            aria-label="Preview PDF"
+            (click)="previewCurrentDraftPdf()"
+            style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
+          >
+            <span class="p-button-icon pi pi-file-pdf" aria-hidden="true" style="color: var(--text-panel); font-size: 1rem;"></span>
+          </button>
+          <button
+            type="button"
+            class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
             [title]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
-            (onClick)="saveExam('Draft')"
-          />
-          <p-button
-            icon="pi pi-send"
-            styleClass="search-btn exam-icon-btn"
-            [ariaLabel]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
+            [aria-label]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
+            (click)="saveExam('Draft')"
+            style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
+          >
+            <span class="p-button-icon pi pi-save" aria-hidden="true" style="color: var(--text-panel); font-size: 1rem;"></span>
+          </button>
+          <button
+            type="button"
+            class="search-btn exam-icon-btn p-button p-component p-button-icon-only"
             [title]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
-            (onClick)="saveExam('Published')"
-          />
+            [aria-label]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
+            (click)="saveExam('Published')"
+            style="cursor: pointer; border: none; background: linear-gradient(135deg, var(--button-primary-start) 0%, var(--button-primary-end) 100%); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
+          >
+            <span class="p-button-icon pi pi-send" aria-hidden="true" style="color: var(--button-primary-text); font-size: 1rem;"></span>
+          </button>
         </div>
       </div>
 
@@ -113,7 +125,7 @@
                   styleClass="reset-btn exam-icon-btn question-card__remove"
                   ariaLabel="Remove question"
                   title="Remove question"
-                  (onClick)="removeQuestion(question.id)"
+                  (click)="removeQuestion(question.id)"
                 />
               }
             </div>
@@ -233,7 +245,7 @@
           styleClass="reset-btn exam-icon-btn"
           ariaLabel="Add question"
           title="Add question"
-          (onClick)="addQuestion()"
+          (click)="addQuestion()"
         />
         <div class="composer-footer__actions">
           <p-button
@@ -241,27 +253,27 @@
             styleClass="reset-btn exam-icon-btn"
             ariaLabel="Preview PDF"
             title="Preview PDF"
-            (onClick)="previewCurrentDraftPdf()"
+            (click)="previewCurrentDraftPdf()"
           />
           <p-button
             icon="pi pi-save"
             styleClass="reset-btn exam-icon-btn"
             [ariaLabel]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
             [title]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
-            (onClick)="saveExam('Draft')"
+            (click)="saveExam('Draft')"
           />
           <p-button
             icon="pi pi-check"
             styleClass="search-btn exam-icon-btn"
             [ariaLabel]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
             [title]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
-            (onClick)="saveExam('Published')"
+            (click)="saveExam('Published')"
           />
         </div>
       </div>
     </p-card>
   } @else {
-    <p-confirmpopup styleClass="exam-delete-popup" />
+    <p-confirmDialog styleClass="exam-delete-dialog" />
 
     <p-card styleClass="search-card">
       <div class="search-card__head">
@@ -302,7 +314,7 @@
             styleClass="search-btn exam-icon-btn"
             ariaLabel="Search exams"
             title="Search exams"
-            (onClick)="applyFilters()"
+            (click)="applyFilters()"
           />
           <p-button
             icon="pi pi-refresh"
@@ -311,7 +323,7 @@
             [text]="true"
             ariaLabel="Reset filters"
             title="Reset filters"
-            (onClick)="resetFilters()"
+            (click)="resetFilters()"
           />
         </div>
       </div>
@@ -335,13 +347,15 @@
             <span class="table-card__notice">{{ notice() }}</span>
           }
 
-          <p-button
-            icon="pi pi-plus"
-            styleClass="search-btn exam-icon-btn table-card__cta"
-            ariaLabel="Create exam"
-            title="Create exam"
-            (onClick)="openCreatePage()"
-          />
+          @if (userRole() !== 'employee') {
+            <p-button
+              icon="pi pi-plus"
+              styleClass="search-btn exam-icon-btn table-card__cta"
+              ariaLabel="Create exam"
+              title="Create exam"
+              (click)="openCreatePage()"
+            />
+          }
         </div>
       </div>
 
@@ -390,32 +404,52 @@
               <p-tag [value]="item.status" [severity]="statusSeverity(item.status)" />
             </td>
             <td>
-              <div class="action-group" aria-label="Exam actions">
-                <p-button
-                  icon="pi pi-file-pdf"
-                  styleClass="action-btn action-btn--view"
-                  [text]="true"
-                  [rounded]="true"
-                  ariaLabel="Preview exam PDF"
-                  (onClick)="previewExamPdf(item)"
-                />
-                <p-button
-                  icon="pi pi-pencil"
-                  styleClass="action-btn action-btn--edit"
-                  [text]="true"
-                  [rounded]="true"
-                  ariaLabel="Edit exam"
-                  (onClick)="openEditPage(item)"
-                />
-                <p-button
-                  icon="pi pi-trash"
-                  styleClass="action-btn action-btn--delete"
-                  [text]="true"
-                  [rounded]="true"
-                  ariaLabel="Delete exam"
-                  (onClick)="confirmDeleteExam($event, item)"
-                />
-              </div>
+              @if (userRole() === 'employee') {
+                <button
+                  type="button"
+                  class="action-btn action-btn--edit p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                  (click)="onStartExam(item)"
+                  (click)="onStartExam(item)"
+                  title="Bắt đầu làm bài thi"
+                  aria-label="Bắt đầu làm bài thi"
+                  style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
+                >
+                  <span class="p-button-icon pi pi-play" aria-hidden="true" style="color: #10b981; font-size: 1.2rem;"></span>
+                </button>
+              } @else {
+                <div class="action-group" aria-label="Exam actions" style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
+                  <button
+                    type="button"
+                    class="action-btn action-btn--view p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                    (click)="previewExamPdf(item); $event.stopPropagation()"
+                    title="Xem trước PDF"
+                    aria-label="Xem trước PDF"
+                    style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
+                  >
+                    <span class="p-button-icon pi pi-file-pdf" aria-hidden="true" style="color: #3b82f6; font-size: 1.1rem;"></span>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--edit p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                    (click)="openEditPage(item); $event.stopPropagation()"
+                    title="Chỉnh sửa đề thi"
+                    aria-label="Chỉnh sửa đề thi"
+                    style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
+                  >
+                    <span class="p-button-icon pi pi-pencil" aria-hidden="true" style="color: #10b981; font-size: 1.1rem;"></span>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn action-btn--delete p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                    (click)="confirmDeleteExam($event, item)"
+                    title="Xóa đề thi"
+                    aria-label="Xóa đề thi"
+                    style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
+                  >
+                    <span class="p-button-icon pi pi-trash" aria-hidden="true" style="color: #ef4444; font-size: 1.1rem;"></span>
+                  </button>
+                </div>
+              }
             </td>
           </tr>
         </ng-template>

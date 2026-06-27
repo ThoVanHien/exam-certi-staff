@@ -16,6 +16,60 @@ interface SubmitExamInput {
 }
 
 export class ExamService {
+  static async getExamsForUser(role: string, department: string) {
+    const filter = role === "super_admin" ? {} : { department };
+    const exams = await examRepository.find({
+      where: filter,
+      order: {
+        id: "DESC"
+      }
+    });
+    return exams;
+  }
+
+  static async getMyResults(userId: number) {
+    return examResultRepository.find({
+      where: { userId },
+      relations: {
+        exam: true
+      },
+      order: {
+        completedAt: "DESC"
+      }
+    });
+  }
+
+  static async getExamForTaking(examId: number) {
+    const exam = await examRepository.findOne({
+      where: { id: examId },
+      relations: {
+        questions: true
+      }
+    });
+
+    if (!exam) {
+      throw new AppError("Khong tim thay de thi", StatusCodes.NOT_FOUND);
+    }
+
+    // Strip correct answers to prevent cheating
+    const secureQuestions = exam.questions
+      .sort((a, b) => a.orderNo - b.orderNo)
+      .map((q) => ({
+        id: q.id,
+        question: q.question,
+        options: q.options,
+        orderNo: q.orderNo
+      }));
+
+    return {
+      id: exam.id,
+      title: exam.title,
+      duration: exam.duration,
+      totalQuestions: exam.totalQuestions,
+      questions: secureQuestions
+    };
+  }
+
   static async submitExam(input: SubmitExamInput) {
     const [user, exam] = await Promise.all([
       userRepository.findOne({ where: { id: input.userId } }),

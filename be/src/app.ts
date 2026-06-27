@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { apiRouter } from "./routes";
 import { errorHandler } from "./middlewares/error-handler.middleware";
+import { env } from "./config/env";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.use("/uploads/certificates", express.static(env.CERT_STORAGE_PATH));
 app.use("/api", apiRouter);
 app.use(errorHandler);
 

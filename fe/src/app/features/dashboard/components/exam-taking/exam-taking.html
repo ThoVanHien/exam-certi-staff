@@ -1,0 +1,181 @@
+<div class="exam-taking-container">
+  @if (loading()) {
+  <div class="loading-state">
+    <i class="pi pi-spin pi-spinner text-4xl mb-4"></i>
+    <p>Đang chuẩn bị đề thi...</p>
+  </div>
+  } @else if (errorMessage()) {
+  <div class="error-state">
+    <p-message severity="error" [text]="errorMessage()" styleClass="w-full max-w-lg mb-4" />
+    <p-button label="Quay lại" icon="pi pi-arrow-left" (click)="backToDashboard()" />
+  </div>
+  } @else {
+  @switch (phase()) {
+  <!-- CONFIRM START PHASE -->
+  @case ('confirm') {
+  <p-card styleClass="exam-confirm-card">
+    <div class="exam-confirm-card__head">
+      <span class="exam-confirm-card__eyebrow">Xác nhận tham gia kỳ thi</span>
+      <h2>{{ exam()?.title }}</h2>
+    </div>
+
+    <div class="exam-confirm-card__body">
+      <div class="rule-box">
+        <h3><i class="pi pi-info-circle mr-2 text-primary"></i> Quy chế thi:</h3>
+        <ul>
+          <li>Thời gian làm bài là <strong>{{ exam()?.duration }} phút</strong>.</li>
+          <li>Đề thi gồm <strong>{{ exam()?.totalQuestions }} câu hỏi</strong> trắc nghiệm khách quan.</li>
+          <li>Hệ thống sẽ <strong>tự động nộp bài</strong> khi hết thời gian làm bài quy định.</li>
+          <li>Không tải lại trang (F5) hoặc đóng trình duyệt trong lúc làm bài để tránh mất kết quả.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exam-confirm-card__footer">
+      <p-button label="Hủy bỏ" icon="pi pi-times" severity="secondary" [text]="true" (click)="backToDashboard()" />
+      <p-button label="Bắt đầu làm bài" icon="pi pi-play" styleClass="search-btn font-bold ml-4"
+        (click)="startExam()" />
+    </div>
+  </p-card>
+  }
+
+  <!-- RUNNING PHASE -->
+  @case ('running') {
+  <div class="exam-workspace">
+    <!-- Main Content (Question panel) -->
+    <div class="exam-main-panel">
+      <p-card styleClass="question-box-card">
+        <div class="question-header">
+          <span class="question-number">Câu hỏi {{ currentQuestionIndex() + 1 }} / {{ exam()?.totalQuestions }}</span>
+          @if (selectedAnswers()[currentQuestion?.id || 0]) {
+          <span class="answered-badge"><i class="pi pi-check mr-1"></i> Đã chọn đáp án</span>
+          } @else {
+          <span class="unanswered-badge"><i class="pi pi-circle mr-1"></i> Chưa trả lời</span>
+          }
+        </div>
+
+        <div class="question-prompt">
+          <p>{{ currentQuestion?.question }}</p>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="options-container">
+          @for (opt of currentQuestion?.options; track opt) {
+          <!-- Standard option structure: e.g. "A. Option Text" -->
+          <div class="option-card"
+            [class.option-card--selected]="selectedAnswers()[currentQuestion?.id || 0] === opt.charAt(0)"
+            (click)="selectAnswer(currentQuestion?.id || 0, opt.charAt(0))">
+            <div class="option-check">
+              <div class="option-check__circle"></div>
+            </div>
+            <span class="option-text">{{ opt }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="question-footer">
+          <p-button label="Câu trước" icon="pi pi-chevron-left" severity="secondary"
+            [disabled]="currentQuestionIndex() === 0" (click)="prevQuestion()" />
+          <p-button label="Câu sau" icon="pi pi-chevron-right" severity="secondary" iconPos="right"
+            [disabled]="currentQuestionIndex() === (exam()?.questions?.length || 1) - 1" (click)="nextQuestion()" />
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Sidebar (Timer & Navigator) -->
+    <div class="exam-sidebar">
+      <!-- Timer widget -->
+      <p-card styleClass="timer-card">
+        <div class="timer-widget" [class.timer-widget--low]="lowTimeWarning()">
+          <i class="pi pi-clock mr-2"></i>
+          <span class="timer-value">{{ formattedTimeLeft }}</span>
+        </div>
+        <p class="timer-label">Thời gian còn lại</p>
+      </p-card>
+
+      <!-- Navigation Grid -->
+      <p-card styleClass="nav-grid-card">
+        <h3>Bản đồ câu hỏi</h3>
+        <div class="nav-grid">
+          @for (q of exam()?.questions; track q.id; let idx = $index) {
+          <button type="button" class="nav-box" [class.nav-box--current]="currentQuestionIndex() === idx"
+            [class.nav-box--answered]="!!selectedAnswers()[q.id]" (click)="selectQuestion(idx)">
+            {{ idx + 1 }}
+          </button>
+          }
+        </div>
+
+        <div class="status-legend">
+          <span class="legend-item"><span class="legend-dot legend-dot--answered"></span> Đã làm</span>
+          <span class="legend-item"><span class="legend-dot legend-dot--unanswered"></span> Chưa làm</span>
+        </div>
+      </p-card>
+
+      <!-- Actions -->
+      <div class="sidebar-actions">
+        <p-button label="Nộp bài thi" icon="pi pi-send" styleClass="search-btn w-full font-bold"
+          [loading]="isSubmitting()" (click)="confirmSubmit()" />
+        <p-button label="Thoát và hủy kết quả" icon="pi pi-sign-out" severity="danger" [text]="true"
+          styleClass="w-full mt-2" (click)="confirmCancel()" />
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- RESULT/COMPLETED PHASE -->
+  @case ('result') {
+  <p-card styleClass="result-card">
+    <div class="result-header">
+      @if (submitResult()?.status === 'passed') {
+      <div class="result-icon-wrapper result-icon-wrapper--pass">
+        <i class="pi pi-verified"></i>
+      </div>
+      <h2>CHÚC MỪNG BẠN ĐÃ ĐẠT!</h2>
+      <p>Bạn đã hoàn thành xuất sắc bài kiểm tra đánh giá chứng chỉ.</p>
+      } @else {
+      <div class="result-icon-wrapper result-icon-wrapper--fail">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <h2>KẾT QUẢ: CHƯA ĐẠT</h2>
+      <p>Rất tiếc, bạn chưa đạt số điểm tối thiểu (70%) để được cấp chứng chỉ lần này.</p>
+      }
+    </div>
+
+    <div class="result-details">
+      <div class="result-stat-row">
+        <span class="stat-label">Tên bài thi</span>
+        <span class="stat-value font-bold">{{ exam()?.title }}</span>
+      </div>
+      <div class="result-stat-row">
+        <span class="stat-label">Mã số kết quả</span>
+        <span class="stat-value font-mono">#ECEP-RES-{{ submitResult()?.resultId }}</span>
+      </div>
+      <hr class="result-divider" />
+      <div class="result-grid">
+        <div class="result-grid-item">
+          <span class="grid-num text-primary">{{ submitResult()?.score }}%</span>
+          <span class="grid-label">Điểm số</span>
+        </div>
+        <div class="result-grid-item">
+          <span class="grid-num">{{ submitResult()?.correctAnswers }}/{{ submitResult()?.totalQuestions }}</span>
+          <span class="grid-label">Số câu đúng</span>
+        </div>
+        <div class="result-grid-item">
+          <span class="grid-num">
+            <p-tag [value]="submitResult()?.status === 'passed' ? 'ĐẠT' : 'CHƯA ĐẠT'"
+              [severity]="submitResult()?.status === 'passed' ? 'success' : 'danger'" />
+          </span>
+          <span class="grid-label">Trạng thái</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-footer">
+      <p-button label="Trở lại danh sách bài thi" icon="pi pi-home" styleClass="search-btn font-bold px-6"
+        (click)="backToDashboard()" />
+    </div>
+  </p-card>
+  }
+  }
+  }
+</div>

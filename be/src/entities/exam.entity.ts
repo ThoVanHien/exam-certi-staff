@@ -29,6 +29,9 @@ export class Exam {
   @Column({ name: "created_by_user_id", type: "int", nullable: true })
   createdByUserId!: number | null;
 
+  @Column({ type: "varchar", length: 100, nullable: true, default: "Production" })
+  department!: string | null;
+
   @OneToMany(() => ExamQuestion, (question) => question.exam)
   questions!: ExamQuestion[];
 
