@@ -1,0 +1,72 @@
+<section class="auth-panel">
+  <p-card styleClass="auth-frame">
+    <div class="brand-mark">
+      <span class="brand-mark__code">SEHC</span>
+      <span class="brand-mark__name">Employee Certification & Examination Platform</span>
+    </div>
+
+    <div class="auth-head">
+      <h1>Sign in</h1>
+      <p>Access the internal platform for certification and examination operations.</p>
+    </div>
+
+    <form class="login-card" [formGroup]="form()" (ngSubmit)="onSubmit()">
+      <label class="field" for="email">
+        <span>Email</span>
+      </label>
+      <input
+        id="email"
+        pInputText
+        type="email"
+        class="field-control"
+        formControlName="email"
+        placeholder="admin@company.local"
+      />
+
+      @if (form().controls['email'].touched && form().controls['email'].invalid) {
+        <p-message
+          severity="error"
+          variant="simple"
+          size="small"
+          text="Please enter a valid email address."
+          styleClass="field-error"
+        />
+      }
+
+      <label class="field" for="password">
+        <span>Password</span>
+      </label>
+      <p-password
+        inputId="password"
+        formControlName="password"
+        placeholder="Enter your password"
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="field-control password-control"
+        inputStyleClass="field-control__input"
+      />
+
+      @if (form().controls['password'].touched && form().controls['password'].invalid) {
+        <p-message
+          severity="error"
+          variant="simple"
+          size="small"
+          text="Password must not be empty."
+          styleClass="field-error"
+        />
+      }
+
+      <p-button
+        type="submit"
+        styleClass="submit-btn"
+        [fluid]="true"
+        [loading]="isSubmitting()"
+        [label]="isSubmitting() ? 'Signing in...' : 'Sign in'"
+      />
+
+      @if (errorMessage()) {
+        <p-message severity="error" [text]="errorMessage()" styleClass="feedback error feedback-message" />
+      }
+    </form>
+  </p-card>
+</section>

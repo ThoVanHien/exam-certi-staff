@@ -1,0 +1,50 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+testem.log
+
+# Environment files
+be/.env
+be/.env.*
+!be/.env.example
+fe/.env
+fe/.env.*
+
+# Dependencies
+be/node_modules/
+fe/node_modules/
+
+# Build output
+be/dist/
+fe/dist/
+fe/tmp/
+fe/out-tsc/
+fe/bazel-out/
+fe/.angular/cache/
+fe/coverage/
+fe/typings/
+
+# Editor and IDE
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.history/
+
+# Visual Studio Code
+.vscode/
+
+# Frontend misc
+fe/.sass-cache/
+fe/connect.lock
+fe/libpeerconnection.log
+fe/__screenshots__/

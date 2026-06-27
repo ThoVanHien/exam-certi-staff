@@ -1,0 +1,40 @@
+<section class="dashboard-shell" [class.dashboard-shell--sidebar-collapsed]="isSidebarCollapsed()">
+  <app-dashboard-sidebar
+    [auth]="auth()"
+    [navigationItems]="navigationItems()"
+    [isCollapsed]="isSidebarCollapsed()"
+    (toggleSidebar)="onToggleSidebar()"
+    (navigate)="onNavigate($event)"
+  />
+
+  <div class="workspace">
+    <app-dashboard-topbar
+      [auth]="auth()"
+      [pageTitle]="pageTitle()"
+      [pageSubtitle]="pageSubtitle()"
+      [currentTheme]="currentTheme()"
+      (themeChange)="onThemeChange($event)"
+      (logout)="onLogout()"
+    />
+
+    @if (selectedSection() === 'employees') {
+      <app-employee-overview
+        [employees]="employees()"
+        [passedCount]="passedCount()"
+        [scheduledCount]="scheduledCount()"
+        [retakeCount]="retakeCount()"
+        [userRole]="auth().user.role"
+      />
+    } @else if (selectedSection() === 'examinations') {
+      <app-exam-overview [exams]="exams()" [userRole]="auth().user.role" />
+    } @else {
+      <app-employee-overview
+        [employees]="employees()"
+        [passedCount]="passedCount()"
+        [scheduledCount]="scheduledCount()"
+        [retakeCount]="retakeCount()"
+        [userRole]="auth().user.role"
+      />
+    }
+  </div>
+</section>

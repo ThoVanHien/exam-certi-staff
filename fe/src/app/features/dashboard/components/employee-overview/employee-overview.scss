@@ -1,0 +1,326 @@
+.workspace__content {
+  padding: var(--space-7);
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.search-card {
+  margin-bottom: var(--space-6);
+}
+
+.summary-card span {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--text-panel-secondary);
+}
+
+.summary-card strong {
+  color: var(--text-panel);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+.table-card__head {
+  margin-bottom: var(--space-5);
+}
+
+.table-card__head h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xl);
+  color: var(--text-panel);
+}
+
+.table-card__head p {
+  margin: 0;
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.search-card__head {
+  margin-bottom: var(--space-5);
+}
+
+.search-card__head h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xl);
+  color: var(--text-panel);
+}
+
+.search-card__head p {
+  margin: 0;
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.search-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.search-field {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.search-field span {
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-field--wide {
+  flex: 1;
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.employee-primary strong {
+  display: block;
+  color: var(--text-panel);
+  font-size: var(--font-size-sm);
+}
+
+.employee-primary span {
+  display: block;
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--surface-muted-panel);
+  border: 1px solid var(--border-panel);
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+:host ::ng-deep .summary-card.p-card,
+:host ::ng-deep .search-card.p-card,
+:host ::ng-deep .table-card.p-card {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+
+:host ::ng-deep .summary-card .p-card-body,
+:host ::ng-deep .summary-card .p-card-content,
+:host ::ng-deep .search-card .p-card-body,
+:host ::ng-deep .search-card .p-card-content,
+:host ::ng-deep .table-card .p-card-body,
+:host ::ng-deep .table-card .p-card-content {
+  padding: 0;
+}
+
+:host ::ng-deep .summary-card .p-card-content {
+  padding: var(--space-6);
+}
+
+:host ::ng-deep .search-card .p-card-content,
+:host ::ng-deep .table-card .p-card-content {
+  padding: var(--space-6);
+}
+
+:host ::ng-deep .search-select.p-select,
+:host ::ng-deep .search-input.p-inputtext {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: var(--surface-soft-panel);
+  border: 1px solid var(--border-panel);
+  color: var(--text-panel);
+  box-shadow: none;
+}
+
+:host ::ng-deep .search-select.p-select:hover,
+:host ::ng-deep .search-input.p-inputtext:hover {
+  border-color: rgba(38, 178, 242, 0.24);
+  background: var(--surface-muted-panel);
+}
+
+:host ::ng-deep .search-select.p-select.p-focus,
+:host ::ng-deep .search-input.p-inputtext:focus {
+  border-color: var(--color-border-muted);
+  box-shadow: 0 0 0 3px rgba(38, 178, 242, 0.12);
+}
+
+:host ::ng-deep .search-select .p-select-label,
+:host ::ng-deep .search-select .p-select-dropdown {
+  color: var(--text-panel);
+}
+
+:host ::ng-deep .search-input.p-inputtext::placeholder {
+  color: var(--text-panel-secondary);
+}
+
+:host ::ng-deep .search-btn.p-button {
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(38, 178, 242, 0.2), rgba(13, 162, 231, 0.9));
+  border: 1px solid rgba(38, 178, 242, 0.3);
+  color: #f8fafc;
+}
+
+:host ::ng-deep .reset-btn.p-button {
+  color: var(--text-panel-secondary);
+}
+
+:host ::ng-deep .employee-table {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-panel);
+}
+
+:host ::ng-deep .employee-table .p-datatable-table-container {
+  background: transparent;
+}
+
+:host ::ng-deep .employee-table .p-datatable-table {
+  min-width: 100%;
+}
+
+:host ::ng-deep .employee-table .p-datatable-header,
+:host ::ng-deep .employee-table thead > tr > th {
+  background: var(--surface-muted-panel);
+  border-color: var(--border-panel);
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+:host ::ng-deep .employee-table tbody > tr {
+  background: var(--surface-soft-panel);
+}
+
+:host ::ng-deep .employee-table tbody > tr > td {
+  border-color: var(--border-panel);
+  color: var(--text-panel);
+}
+
+:host ::ng-deep .employee-table .p-paginator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--surface-muted-panel);
+  border-top: 1px solid var(--border-panel);
+  color: var(--text-panel-secondary);
+}
+
+:host ::ng-deep .employee-table .p-paginator-current {
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+:host ::ng-deep .employee-table .p-paginator-pages {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+:host ::ng-deep .employee-table .p-paginator .p-paginator-page,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-next,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-prev,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-first,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-last {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid var(--border-panel);
+  background: var(--surface-panel);
+  color: var(--text-panel);
+  box-shadow: none;
+}
+
+:host ::ng-deep .employee-table .p-paginator .p-paginator-page.p-paginator-page-selected {
+  background: rgba(38, 178, 242, 0.16);
+  border-color: rgba(38, 178, 242, 0.3);
+  color: var(--color-border-muted);
+}
+
+:host ::ng-deep .employee-table .p-paginator .p-paginator-page:not(.p-disabled):hover,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-next:not(.p-disabled):hover,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-prev:not(.p-disabled):hover,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-first:not(.p-disabled):hover,
+:host ::ng-deep .employee-table .p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: var(--surface-soft-panel);
+  border-color: rgba(38, 178, 242, 0.24);
+}
+
+:host ::ng-deep .employee-table .p-paginator-rpp-dropdown {
+  min-width: 88px;
+  border-radius: 12px;
+  border: 1px solid var(--border-panel);
+  background: var(--surface-panel);
+}
+
+:host ::ng-deep .employee-table .p-paginator-rpp-dropdown:hover,
+:host ::ng-deep .employee-table .p-paginator-rpp-dropdown.p-focus {
+  background: var(--surface-soft-panel);
+  border-color: rgba(38, 178, 242, 0.24);
+  box-shadow: none;
+}
+
+:host ::ng-deep .employee-table .p-paginator-rpp-dropdown .p-select-label,
+:host ::ng-deep .employee-table .p-paginator-rpp-dropdown .p-select-dropdown {
+  color: var(--text-panel);
+}
+
+:host ::ng-deep .employee-table .p-tag {
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .workspace__content {
+    padding: var(--space-6);
+  }
+
+  .dashboard-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-actions {
+    justify-content: flex-end;
+  }
+
+  :host ::ng-deep .employee-table .p-paginator {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :host ::ng-deep .search-card .p-card-content,
+  :host ::ng-deep .table-card .p-card-content {
+    padding: var(--space-4);
+  }
+}

@@ -1,0 +1,221 @@
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-7);
+  border-bottom: 1px solid var(--border-panel);
+  background: var(--topbar-bg);
+  backdrop-filter: blur(10px);
+}
+
+.topbar__title {
+  max-width: 760px;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  width: auto;
+  position: relative;
+}
+
+.dashboard-eyebrow {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-border-muted);
+}
+
+.topbar h1 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-3xl);
+  line-height: 1.1;
+  color: var(--text-panel);
+}
+
+.dashboard-subtitle {
+  max-width: 680px;
+  margin: 0;
+  color: var(--text-panel-secondary);
+  line-height: var(--font-line-height-base);
+}
+
+:host ::ng-deep .theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-panel);
+}
+
+:host ::ng-deep .icon-btn.p-button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-panel);
+  background: var(--surface-panel);
+  color: var(--text-panel);
+}
+
+:host ::ng-deep .icon-btn.p-button:hover {
+  background: var(--surface-muted-panel);
+  border-color: var(--color-border-muted);
+}
+
+:host ::ng-deep .theme-icon-btn.p-button {
+  border-color: transparent;
+}
+
+:host ::ng-deep .theme-icon-btn.p-button:not(.p-button-text) {
+  background: rgba(38, 178, 242, 0.16);
+  color: var(--color-border-muted);
+}
+
+.account-popover-trigger {
+  display: inline-flex;
+}
+
+:host ::ng-deep .account-popover.p-popover {
+  margin-top: 10px;
+  border: 0 !important;
+  border-radius: 22px;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  outline: none !important;
+}
+
+:host ::ng-deep .account-popover .p-popover-content {
+  padding: 0 !important;
+  border-radius: 22px;
+  overflow: hidden;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .account-popover::before,
+:host ::ng-deep .account-popover::after {
+  display: none;
+}
+
+:host ::ng-deep .account-popover .p-popover {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.account-card {
+  min-width: 296px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(18, 26, 35, 0.98) 0%, rgba(8, 13, 19, 0.98) 100%);
+  border: 1px solid rgba(38, 178, 242, 0.18);
+  box-shadow:
+    0 22px 60px rgba(2, 6, 23, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+.account-card__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(38, 178, 242, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+}
+
+.account-card__avatar {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(38, 178, 242, 0.3), rgba(13, 162, 231, 0.14));
+  border: 1px solid rgba(38, 178, 242, 0.22);
+  color: #d9f6ff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.account-card__identity {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.account-card__identity strong {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #f8fafc;
+}
+
+.account-card__identity span {
+  width: fit-content;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(38, 178, 242, 0.14);
+  border: 1px solid rgba(38, 178, 242, 0.14);
+  color: #a7e5ff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.account-card__body {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px 18px;
+}
+
+.account-card__row {
+  display: grid;
+  gap: 5px;
+  padding: 12px 13px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.04));
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.account-card__label {
+  color: #7dd3fc;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.account-card__value {
+  color: #e5edf7;
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-6);
+  }
+
+  .topbar__actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,139 @@
+<div class="workspace__content">
+  <p-card styleClass="search-card">
+    <div class="search-card__head">
+      <h2>Search Exam</h2>
+      <p>Search by title, description, exam code, creator, or department while keeping the current internal dashboard style.</p>
+    </div>
+
+    <div class="search-grid search-grid--exams">
+      <label class="search-field search-field--wide">
+        <span>Search</span>
+        <input
+          pInputText
+          [(ngModel)]="draftKeyword"
+          class="search-input"
+          type="text"
+          placeholder="Title, description, exam code or created by"
+        />
+      </label>
+
+      <label class="search-field">
+        <span>Search by department</span>
+        <p-select
+          [options]="departmentOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="draftDepartment"
+          placeholder="All departments"
+          styleClass="search-select"
+        />
+      </label>
+
+      <div class="search-actions">
+        <p-button label="Search" icon="pi pi-search" styleClass="search-btn" (onClick)="applyFilters()" />
+        <p-button
+          label="Reset"
+          icon="pi pi-refresh"
+          styleClass="reset-btn"
+          severity="secondary"
+          [text]="true"
+          (onClick)="resetFilters()"
+        />
+      </div>
+    </div>
+  </p-card>
+
+  <p-card styleClass="table-card">
+    <div class="table-card__head table-card__head--split">
+      <div>
+        <h2>Total Exams: {{ filteredExams().length }}</h2>
+        <p>
+          @if (userRole() === 'super_admin') {
+            Manage created examinations across all parts.
+          } @else {
+            Manage examinations assigned to your part.
+          }
+        </p>
+      </div>
+
+      <p-button label="New" icon="pi pi-plus" styleClass="search-btn table-card__cta" />
+    </div>
+
+    <p-table
+      [value]="filteredExams()"
+      styleClass="exam-table"
+      [tableStyle]="{ 'min-width': '68rem' }"
+      [paginator]="true"
+      [rows]="5"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      paginatorDropdownAppendTo="body"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} exams"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>No</th>
+          <th>Exam code</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Department</th>
+          <th>Created by</th>
+          <th>Format</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <tr>
+          <td>{{ rowIndex + 1 }}</td>
+          <td><span class="exam-code">{{ item.code }}</span></td>
+          <td>
+            <div class="exam-title">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.questionCount }} questions · {{ item.durationMinutes }} mins</span>
+            </div>
+          </td>
+          <td class="exam-description">{{ item.description }}</td>
+          <td>{{ item.department }}</td>
+          <td>{{ item.createdBy }}</td>
+          <td><span class="meta-pill">MCQ Assessment</span></td>
+          <td>
+            <p-tag [value]="item.status" [severity]="statusSeverity(item.status)" />
+          </td>
+          <td>
+            <div class="action-group" aria-label="Exam actions">
+              <p-button
+                icon="pi pi-eye"
+                styleClass="action-btn action-btn--view"
+                [text]="true"
+                [rounded]="true"
+                ariaLabel="View exam"
+              />
+              <p-button
+                icon="pi pi-pencil"
+                styleClass="action-btn action-btn--edit"
+                [text]="true"
+                [rounded]="true"
+                ariaLabel="Edit exam"
+              />
+              <p-button
+                icon="pi pi-trash"
+                styleClass="action-btn action-btn--delete"
+                [text]="true"
+                [rounded]="true"
+                ariaLabel="Delete exam"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9">No exams found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

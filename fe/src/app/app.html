@@ -1,0 +1,34 @@
+<main
+  class="app-shell"
+  [class.app-shell--authenticated]="!!loginResult()"
+  [class.theme-light]="currentTheme() === 'light'"
+  [class.theme-dark]="currentTheme() === 'dark'"
+>
+  @if (loginResult(); as result) {
+    <app-dashboard-page
+      [auth]="result"
+      [navigationItems]="navigationItems()"
+      [selectedSection]="selectedSection()"
+      [employees]="visibleEmployees"
+      [exams]="visibleExams"
+      [pageTitle]="pageTitle"
+      [pageSubtitle]="pageSubtitle"
+      [passedCount]="passedCount"
+      [scheduledCount]="scheduledCount"
+      [retakeCount]="retakeCount"
+      [currentTheme]="currentTheme()"
+      [isSidebarCollapsed]="isSidebarCollapsed()"
+      (themeChange)="setTheme($event)"
+      (toggleSidebar)="toggleSidebar()"
+      (navigate)="setSection($event)"
+      (logout)="logout()"
+    />
+  } @else {
+    <app-login-panel
+      [form]="loginForm"
+      [isSubmitting]="isSubmitting()"
+      [errorMessage]="errorMessage()"
+      (submitForm)="onSubmit()"
+    />
+  }
+</main>

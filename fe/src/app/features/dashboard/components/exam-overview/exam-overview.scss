@@ -1,0 +1,340 @@
+.workspace__content {
+  padding: var(--space-7);
+}
+
+.search-card {
+  margin-bottom: var(--space-6);
+}
+
+.search-card__head {
+  margin-bottom: var(--space-5);
+}
+
+.search-card__head h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xl);
+  color: var(--text-panel);
+}
+
+.search-card__head p,
+.table-card__head p {
+  margin: 0;
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.search-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.search-grid--exams {
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 1fr) auto;
+  align-items: end;
+}
+
+.search-field {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.search-field span {
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-field--wide {
+  min-width: 0;
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.table-card__head {
+  margin-bottom: var(--space-5);
+}
+
+.table-card__head--split {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.table-card__head h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xl);
+  color: var(--text-panel);
+}
+
+.table-card__cta {
+  flex-shrink: 0;
+}
+
+.exam-code {
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.exam-title strong {
+  display: block;
+  color: var(--text-panel);
+  font-size: var(--font-size-sm);
+}
+
+.exam-title span {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.exam-description {
+  min-width: 220px;
+  color: var(--text-panel-secondary);
+  line-height: 1.5;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--surface-muted-panel);
+  border: 1px solid var(--border-panel);
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:host ::ng-deep .search-card.p-card,
+:host ::ng-deep .table-card.p-card {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+
+:host ::ng-deep .search-card .p-card-body,
+:host ::ng-deep .search-card .p-card-content,
+:host ::ng-deep .table-card .p-card-body,
+:host ::ng-deep .table-card .p-card-content {
+  padding: 0;
+}
+
+:host ::ng-deep .search-card .p-card-content,
+:host ::ng-deep .table-card .p-card-content {
+  padding: var(--space-6);
+}
+
+:host ::ng-deep .search-select.p-select,
+:host ::ng-deep .search-input.p-inputtext {
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: var(--surface-soft-panel);
+  border: 1px solid var(--border-panel);
+  color: var(--text-panel);
+  box-shadow: none;
+}
+
+:host ::ng-deep .search-select.p-select:hover,
+:host ::ng-deep .search-input.p-inputtext:hover {
+  border-color: rgba(38, 178, 242, 0.24);
+  background: var(--surface-muted-panel);
+}
+
+:host ::ng-deep .search-select.p-select.p-focus,
+:host ::ng-deep .search-input.p-inputtext:focus {
+  border-color: var(--color-border-muted);
+  box-shadow: 0 0 0 3px rgba(38, 178, 242, 0.12);
+}
+
+:host ::ng-deep .search-select .p-select-label,
+:host ::ng-deep .search-select .p-select-dropdown {
+  color: var(--text-panel);
+}
+
+:host ::ng-deep .search-input.p-inputtext::placeholder {
+  color: var(--text-panel-secondary);
+}
+
+:host ::ng-deep .search-btn.p-button {
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(38, 178, 242, 0.2), rgba(13, 162, 231, 0.9));
+  border: 1px solid rgba(38, 178, 242, 0.3);
+  color: #f8fafc;
+}
+
+:host ::ng-deep .reset-btn.p-button {
+  color: var(--text-panel-secondary);
+}
+
+:host ::ng-deep .exam-table {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-panel);
+}
+
+:host ::ng-deep .exam-table .p-datatable-table-container {
+  background: transparent;
+}
+
+:host ::ng-deep .exam-table thead > tr > th {
+  background: var(--surface-muted-panel);
+  border-color: var(--border-panel);
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+:host ::ng-deep .exam-table tbody > tr {
+  background: var(--surface-soft-panel);
+}
+
+:host ::ng-deep .exam-table tbody > tr > td {
+  border-color: var(--border-panel);
+  color: var(--text-panel);
+  vertical-align: top;
+}
+
+:host ::ng-deep .exam-table .p-tag {
+  border-radius: 999px;
+}
+
+:host ::ng-deep .exam-table .action-btn.p-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-panel);
+  background: var(--surface-panel);
+  color: var(--text-panel-secondary);
+  box-shadow: none;
+}
+
+:host ::ng-deep .exam-table .action-btn.p-button:hover {
+  background: var(--surface-muted-panel);
+  border-color: rgba(38, 178, 242, 0.24);
+}
+
+:host ::ng-deep .exam-table .action-btn--view.p-button:hover {
+  color: var(--color-border-muted);
+}
+
+:host ::ng-deep .exam-table .action-btn--edit.p-button:hover {
+  color: #7dd3fc;
+}
+
+:host ::ng-deep .exam-table .action-btn--delete.p-button:hover {
+  color: #fda4af;
+  border-color: rgba(244, 114, 182, 0.24);
+}
+
+:host ::ng-deep .exam-table .p-paginator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--surface-muted-panel);
+  border-top: 1px solid var(--border-panel);
+  color: var(--text-panel-secondary);
+}
+
+:host ::ng-deep .exam-table .p-paginator-current {
+  color: var(--text-panel-secondary);
+  font-size: var(--font-size-sm);
+}
+
+:host ::ng-deep .exam-table .p-paginator-pages {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+:host ::ng-deep .exam-table .p-paginator .p-paginator-page,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-next,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-prev,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-first,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-last {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid var(--border-panel);
+  background: var(--surface-panel);
+  color: var(--text-panel);
+  box-shadow: none;
+}
+
+:host ::ng-deep .exam-table .p-paginator .p-paginator-page.p-paginator-page-selected {
+  background: rgba(38, 178, 242, 0.16);
+  border-color: rgba(38, 178, 242, 0.3);
+  color: var(--color-border-muted);
+}
+
+:host ::ng-deep .exam-table .p-paginator .p-paginator-page:not(.p-disabled):hover,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-next:not(.p-disabled):hover,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-prev:not(.p-disabled):hover,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-first:not(.p-disabled):hover,
+:host ::ng-deep .exam-table .p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: var(--surface-soft-panel);
+  border-color: rgba(38, 178, 242, 0.24);
+}
+
+:host ::ng-deep .exam-table .p-paginator-rpp-dropdown {
+  min-width: 88px;
+  border-radius: 12px;
+  border: 1px solid var(--border-panel);
+  background: var(--surface-panel);
+}
+
+:host ::ng-deep .exam-table .p-paginator-rpp-dropdown:hover,
+:host ::ng-deep .exam-table .p-paginator-rpp-dropdown.p-focus {
+  background: var(--surface-soft-panel);
+  border-color: rgba(38, 178, 242, 0.24);
+  box-shadow: none;
+}
+
+:host ::ng-deep .exam-table .p-paginator-rpp-dropdown .p-select-label,
+:host ::ng-deep .exam-table .p-paginator-rpp-dropdown .p-select-dropdown {
+  color: var(--text-panel);
+}
+
+@media (max-width: 900px) {
+  .workspace__content {
+    padding: var(--space-6);
+  }
+
+  .search-grid--exams {
+    grid-template-columns: 1fr;
+  }
+
+  .search-actions {
+    justify-content: flex-end;
+  }
+
+  .table-card__head--split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :host ::ng-deep .search-card .p-card-content,
+  :host ::ng-deep .table-card .p-card-content {
+    padding: var(--space-4);
+  }
+
+  :host ::ng-deep .exam-table .p-paginator {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

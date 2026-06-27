@@ -1,0 +1,39 @@
+<aside class="sidebar" [class.sidebar--collapsed]="isCollapsed()">
+  <div class="sidebar__brand">
+    <div class="sidebar__logo-card">
+      <span class="sidebar__wordmark" aria-label="SEHC">SEHC</span>
+    </div>
+  </div>
+
+  <p-menu [model]="menuItems()" styleClass="sidebar__nav" ariaLabel="Management navigation">
+    <ng-template #item let-item>
+      <button
+        type="button"
+        class="nav-item"
+        [class.nav-item--active]="item.styleClass === 'nav-item--active'"
+        (click)="onNavigate(item.key)"
+      >
+        <span class="nav-item__icon" aria-hidden="true">
+          <i [class]="item.icon"></i>
+        </span>
+
+        <span class="nav-item__copy">
+          <strong>{{ item.label }}</strong>
+          <span>{{ item.hint }}</span>
+        </span>
+      </button>
+    </ng-template>
+  </p-menu>
+
+  <p-button
+    [icon]="isCollapsed() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+    styleClass="sidebar__toggle"
+    [text]="true"
+    [rounded]="true"
+    severity="secondary"
+    (onClick)="onToggleSidebar()"
+    [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+    [attr.aria-pressed]="isCollapsed()"
+    title="Toggle sidebar"
+  />
+</aside>

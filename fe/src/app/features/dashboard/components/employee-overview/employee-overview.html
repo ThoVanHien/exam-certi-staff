@@ -1,0 +1,171 @@
+<div class="workspace__content">
+  <section class="dashboard-summary">
+    <p-card styleClass="summary-card">
+      <span>Total employees</span>
+      <strong>{{ filteredEmployees().length }}</strong>
+    </p-card>
+    <p-card styleClass="summary-card">
+      <span>Passed exams</span>
+      <strong>{{ filteredPassedCount() }}</strong>
+    </p-card>
+    <p-card styleClass="summary-card">
+      <span>Scheduled exams</span>
+      <strong>{{ filteredScheduledCount() }}</strong>
+    </p-card>
+    <p-card styleClass="summary-card">
+      <span>Require retake</span>
+      <strong>{{ filteredRetakeCount() }}</strong>
+    </p-card>
+  </section>
+
+  <p-card styleClass="search-card">
+    <div class="search-card__head">
+      <h2>Search & Filter</h2>
+      <p>Refine the employee roster by department, certification, exam status, and employee information.</p>
+    </div>
+
+    <div class="search-grid">
+      <label class="search-field">
+        <span>Department</span>
+        <p-select
+          [options]="departmentOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="draftDepartment"
+          placeholder="All departments"
+          styleClass="search-select"
+        />
+      </label>
+
+      <label class="search-field">
+        <span>Certification</span>
+        <p-select
+          [options]="certificationOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="draftCertification"
+          placeholder="All certifications"
+          styleClass="search-select"
+        />
+      </label>
+
+      <label class="search-field">
+        <span>Exam status</span>
+        <p-select
+          [options]="examStatusOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="draftExamStatus"
+          placeholder="All statuses"
+          styleClass="search-select"
+        />
+      </label>
+
+      <label class="search-field">
+        <span>Expiry year</span>
+        <p-select
+          [options]="expiryYearOptions()"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="draftExpiryYear"
+          placeholder="All years"
+          styleClass="search-select"
+        />
+      </label>
+    </div>
+
+    <div class="search-bar">
+      <label class="search-field search-field--wide">
+        <span>Search by employee info</span>
+        <input
+          pInputText
+          [(ngModel)]="draftKeyword"
+          class="search-input"
+          type="text"
+          placeholder="Knox ID, employee ID, name, department, certification"
+        />
+      </label>
+
+      <div class="search-actions">
+        <p-button
+          label="Search"
+          icon="pi pi-search"
+          styleClass="search-btn"
+          (onClick)="applyFilters()"
+        />
+        <p-button
+          label="Reset"
+          icon="pi pi-refresh"
+          styleClass="reset-btn"
+          severity="secondary"
+          [text]="true"
+          (onClick)="resetFilters()"
+        />
+      </div>
+    </div>
+  </p-card>
+
+  <p-card styleClass="table-card">
+    <div class="table-card__head">
+      <h2>Employees</h2>
+      <p>
+        @if (userRole() === 'super_admin') {
+          Employees assigned to internal examinations across all parts.
+        } @else {
+          Employees assigned to internal examinations in your part.
+        }
+      </p>
+    </div>
+
+    <p-table
+      [value]="filteredEmployees()"
+      styleClass="employee-table"
+      [tableStyle]="{ 'min-width': '48rem' }"
+      [paginator]="true"
+      [rows]="5"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      paginatorDropdownAppendTo="body"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Employee</th>
+          <th>Department</th>
+          <th>Certification</th>
+          <th>Exam status</th>
+          <th>Expiry date</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>
+            <div class="employee-primary">
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.id }}</span>
+            </div>
+          </td>
+          <td>{{ item.department }}</td>
+          <td>
+            <span class="meta-pill">{{ item.certification }}</span>
+          </td>
+          <td>
+            <p-tag
+              [value]="item.examStatus"
+              [icon]="statusIcon(item.examStatus)"
+              [severity]="statusSeverity(item.examStatus)"
+            />
+          </td>
+          <td>{{ item.expiry }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">No employees found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

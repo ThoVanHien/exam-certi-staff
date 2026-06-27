@@ -1,0 +1,95 @@
+<header class="topbar">
+  <div class="topbar__title">
+    <p class="dashboard-eyebrow">SEHC Management</p>
+    <h1>{{ pageTitle() }}</h1>
+    <p class="dashboard-subtitle">{{ pageSubtitle() }}</p>
+  </div>
+
+  <div class="topbar__actions">
+    <div class="theme-switch" aria-label="Display mode">
+      <p-button
+        icon="pi pi-sun"
+        styleClass="icon-btn theme-icon-btn"
+        [rounded]="true"
+        [text]="currentTheme() !== 'light'"
+        [severity]="currentTheme() === 'light' ? 'info' : 'secondary'"
+        ariaLabel="Light mode"
+        title="Light mode"
+        (onClick)="setTheme('light')"
+      />
+
+      <p-button
+        icon="pi pi-moon"
+        styleClass="icon-btn theme-icon-btn"
+        [rounded]="true"
+        [text]="currentTheme() !== 'dark'"
+        [severity]="currentTheme() === 'dark' ? 'info' : 'secondary'"
+        ariaLabel="Dark mode"
+        title="Dark mode"
+        (onClick)="setTheme('dark')"
+      />
+    </div>
+
+    <div
+      class="account-popover-trigger"
+      (mouseenter)="showAccountPopover($event, accountPopover)"
+      (mouseleave)="scheduleHideAccountPopover(accountPopover)"
+      (focusin)="showAccountPopover($event, accountPopover)"
+      (focusout)="scheduleHideAccountPopover(accountPopover)"
+    >
+      <p-button
+        icon="pi pi-user"
+        styleClass="icon-btn"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        ariaLabel="Account information"
+        title="Account information"
+      />
+    </div>
+
+    <p-button
+      icon="pi pi-sign-out"
+      styleClass="icon-btn"
+      [rounded]="true"
+      [text]="true"
+      severity="secondary"
+      pTooltip="Sign out"
+      tooltipPosition="bottom"
+      ariaLabel="Sign out"
+      title="Sign out"
+      (onClick)="onLogout()"
+    />
+
+    <p-popover
+      #accountPopover
+      styleClass="account-popover"
+      [dismissable]="false"
+      [focusOnShow]="false"
+      (mouseenter)="keepAccountPopoverOpen()"
+      (mouseleave)="scheduleHideAccountPopover(accountPopover)"
+    >
+      <div class="account-card">
+        <div class="account-card__header">
+          <div class="account-card__avatar">{{ userInitials }}</div>
+          <div class="account-card__identity">
+            <strong>{{ user.name }}</strong>
+            <span>{{ roleLabel }}</span>
+          </div>
+        </div>
+
+        <div class="account-card__body">
+          <div class="account-card__row">
+            <span class="account-card__label">Email</span>
+            <span class="account-card__value">{{ user.email }}</span>
+          </div>
+
+          <div class="account-card__row">
+            <span class="account-card__label">Department</span>
+            <span class="account-card__value">{{ user.department }}</span>
+          </div>
+        </div>
+      </div>
+    </p-popover>
+  </div>
+</header>
