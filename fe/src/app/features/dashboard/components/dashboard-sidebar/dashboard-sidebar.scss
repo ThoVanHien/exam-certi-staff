@@ -46,6 +46,9 @@
   letter-spacing: 0.24em;
   text-transform: uppercase;
   text-shadow: rgba(38, 178, 242, 0.24) 0 6px 18px;
+  -webkit-user-select: none; /* Dành cho Safari */
+  -ms-user-select: none; /* Dành cho IE 10 và IE 11 */
+  user-select: none;
 }
 
 .sidebar__nav {
@@ -75,6 +78,7 @@
   transition:
     background var(--motion-duration-instant) ease,
     border-color var(--motion-duration-instant) ease,
+    box-shadow var(--motion-duration-instant) ease,
     transform var(--motion-duration-instant) ease;
 }
 
@@ -114,9 +118,10 @@
 
 .nav-item:hover,
 .nav-item:focus-visible {
-  background: var(--surface-muted-panel);
-  border-color: rgba(38, 178, 242, 0.24);
+  background: rgba(38, 178, 242, 0.08);
+  border-color: rgba(38, 178, 242, 0.18);
   color: var(--text-panel);
+  box-shadow: inset 0 0 0 1px rgba(38, 178, 242, 0.08);
   outline: none;
 }
 
@@ -236,6 +241,8 @@
   justify-content: center;
   border-radius: 999px;
   border: 1px solid currentColor;
+  background: var(--button-secondary-bg);
+  box-shadow: var(--shadow-button-soft);
 }
 
 :host ::ng-deep .sidebar__nav.p-menu {
@@ -265,6 +272,12 @@
   outline: none !important;
 }
 
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item,
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item-content {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
 :host ::ng-deep .sidebar__nav.p-menu .p-menu-item-link {
   border-radius: var(--radius-md);
   color: inherit;
@@ -282,30 +295,73 @@
   box-shadow: none;
 }
 
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item-content:hover,
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item-content:focus-within,
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item-link:hover,
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item-link:focus-visible {
+  background: transparent !important;
+}
+
 :host ::ng-deep .sidebar__nav.p-menu .p-menu-item-icon,
 :host ::ng-deep .sidebar__nav.p-menu .p-menu-item-label {
   color: inherit;
 }
 
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) .nav-item:hover,
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) .nav-item:focus-visible,
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) > .p-menu-item-content:hover .nav-item,
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) > .p-menu-item-content:focus-within .nav-item {
-  background: var(--surface-muted-panel);
-  border-color: rgba(38, 178, 242, 0.24);
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item .nav-item:not(.nav-item--active):hover,
+:host ::ng-deep .sidebar__nav.p-menu .p-menu-item .nav-item:not(.nav-item--active):focus-visible,
+:host
+  ::ng-deep
+  .sidebar__nav.p-menu
+  .p-menu-item
+  > .p-menu-item-content:hover
+  .nav-item:not(.nav-item--active),
+:host
+  ::ng-deep
+  .sidebar__nav.p-menu
+  .p-menu-item
+  > .p-menu-item-content:focus-within
+  .nav-item:not(.nav-item--active) {
+  background: rgba(38, 178, 242, 0.08);
+  border-color: rgba(38, 178, 242, 0.18);
   color: var(--text-panel);
-  box-shadow: none;
+  box-shadow: inset 0 0 0 1px rgba(38, 178, 242, 0.08);
   outline: none;
 }
 
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) > .p-menu-item-content:hover .nav-item__icon,
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) > .p-menu-item-content:focus-within .nav-item__icon {
+:host
+  ::ng-deep
+  .sidebar__nav.p-menu
+  .p-menu-item
+  > .p-menu-item-content:hover
+  .nav-item:not(.nav-item--active)
+  .nav-item__icon,
+:host
+  ::ng-deep
+  .sidebar__nav.p-menu
+  .p-menu-item
+  > .p-menu-item-content:focus-within
+  .nav-item:not(.nav-item--active)
+  .nav-item__icon {
   background: rgba(38, 178, 242, 0.12);
   color: var(--color-border-muted);
   border-color: rgba(38, 178, 242, 0.24);
 }
 
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) > .p-menu-item-content:hover .nav-item__copy span,
-:host ::ng-deep .sidebar__nav.p-menu .p-menu-item:not(.nav-item--active) > .p-menu-item-content:focus-within .nav-item__copy span {
+:host
+  ::ng-deep
+  .sidebar__nav.p-menu
+  .p-menu-item
+  > .p-menu-item-content:hover
+  .nav-item:not(.nav-item--active)
+  .nav-item__copy
+  span,
+:host
+  ::ng-deep
+  .sidebar__nav.p-menu
+  .p-menu-item
+  > .p-menu-item-content:focus-within
+  .nav-item:not(.nav-item--active)
+  .nav-item__copy
+  span {
   color: var(--text-panel-secondary);
 }

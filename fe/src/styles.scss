@@ -52,6 +52,8 @@ body {
     rgba(0, 0, 0, 0) 0px 0px 0px 0px,
     rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
     rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+  --shadow-button-soft: 0 12px 24px -18px rgba(8, 15, 28, 0.72);
+  --shadow-button-primary: 0 18px 34px -18px rgba(13, 162, 231, 0.55);
 
   --motion-duration-instant: 150ms;
   --motion-duration-fast: 300ms;
@@ -69,6 +71,35 @@ body {
 
 .p-component {
   font-family: var(--font-family-primary);
+}
+
+.p-button {
+  gap: 0.55rem;
+  border-radius: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition:
+    transform var(--motion-duration-instant) ease,
+    background var(--motion-duration-instant) ease,
+    border-color var(--motion-duration-instant) ease,
+    color var(--motion-duration-instant) ease,
+    box-shadow var(--motion-duration-instant) ease;
+}
+
+.p-button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.p-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(38, 178, 242, 0.18);
+}
+
+.p-button .p-button-icon {
+  font-size: 0.95rem;
+}
+
+.p-button .p-button-label {
+  font-weight: inherit;
 }
 
 .account-popover.p-popover {

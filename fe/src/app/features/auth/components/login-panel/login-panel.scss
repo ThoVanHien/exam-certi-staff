@@ -163,16 +163,24 @@
 }
 
 :host ::ng-deep .submit-btn.p-button {
-  border-radius: 999px;
-  background: linear-gradient(135deg, #26b2f2 0%, #0da2e7 100%);
-  border-color: transparent;
-  color: var(--color-text-inverse);
-  box-shadow: var(--shadow-1);
+  min-height: 48px;
+  border-radius: 16px;
+  padding-inline: 1.2rem;
+  background: linear-gradient(135deg, var(--button-primary-start) 0%, var(--button-primary-end) 100%);
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  color: var(--button-primary-text);
+  box-shadow: var(--shadow-button-primary);
 }
 
 :host ::ng-deep .submit-btn.p-button:not(:disabled):hover {
-  filter: brightness(1.03);
-  transform: translateY(-1px);
+  filter: brightness(1.04) saturate(1.02);
+  box-shadow: 0 22px 38px -22px rgba(13, 162, 231, 0.72);
+}
+
+:host ::ng-deep .submit-btn.p-button:not(:disabled):focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(38, 178, 242, 0.24),
+    0 22px 38px -22px rgba(13, 162, 231, 0.72);
 }
 
 :host ::ng-deep .feedback-message.p-message {

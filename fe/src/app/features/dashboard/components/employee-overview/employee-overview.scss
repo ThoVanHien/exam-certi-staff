@@ -155,14 +155,19 @@
 }
 
 :host ::ng-deep .search-select.p-select:hover,
-:host ::ng-deep .search-input.p-inputtext:hover {
+:host ::ng-deep .search-select.p-select:enabled:hover,
+:host ::ng-deep .search-input.p-inputtext:hover,
+:host ::ng-deep .search-input.p-inputtext:enabled:hover {
   border-color: rgba(38, 178, 242, 0.24);
   background: var(--surface-muted-panel);
+  color: var(--text-panel);
 }
 
 :host ::ng-deep .search-select.p-select.p-focus,
 :host ::ng-deep .search-input.p-inputtext:focus {
   border-color: var(--color-border-muted);
+  background: var(--surface-muted-panel);
+  color: var(--text-panel);
   box-shadow: 0 0 0 3px rgba(38, 178, 242, 0.12);
 }
 
@@ -176,14 +181,34 @@
 }
 
 :host ::ng-deep .search-btn.p-button {
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgba(38, 178, 242, 0.2), rgba(13, 162, 231, 0.9));
-  border: 1px solid rgba(38, 178, 242, 0.3);
-  color: #f8fafc;
+  min-height: 44px;
+  padding-inline: 1.05rem;
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--button-primary-start) 0%, var(--button-primary-end) 100%);
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  color: var(--button-primary-text);
+  box-shadow: var(--shadow-button-primary);
+}
+
+:host ::ng-deep .search-btn.p-button:not(:disabled):hover {
+  filter: brightness(1.04);
+  box-shadow: 0 18px 32px -22px rgba(13, 162, 231, 0.68);
 }
 
 :host ::ng-deep .reset-btn.p-button {
-  color: var(--text-panel-secondary);
+  min-height: 44px;
+  padding-inline: 1rem;
+  border-radius: 15px;
+  border: 1px solid var(--button-secondary-border);
+  background: var(--button-secondary-bg);
+  color: var(--text-panel);
+  box-shadow: var(--shadow-button-soft);
+}
+
+:host ::ng-deep .reset-btn.p-button:not(:disabled):hover {
+  background: var(--button-secondary-bg-hover);
+  border-color: rgba(38, 178, 242, 0.24);
+  color: var(--text-panel);
 }
 
 :host ::ng-deep .employee-table {
