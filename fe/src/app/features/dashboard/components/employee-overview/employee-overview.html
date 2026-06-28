@@ -1,27 +1,127 @@
 <div class="workspace__content">
-  <section class="dashboard-summary">
-    <p-card styleClass="summary-card">
-      <span>Total employees</span>
-      <strong>{{ filteredEmployees().length }}</strong>
-    </p-card>
-    <p-card styleClass="summary-card">
-      <span>Passed exams</span>
-      <strong>{{ filteredPassedCount() }}</strong>
-    </p-card>
-    <p-card styleClass="summary-card">
-      <span>Scheduled exams</span>
-      <strong>{{ filteredScheduledCount() }}</strong>
-    </p-card>
-    <p-card styleClass="summary-card">
-      <span>Require retake</span>
-      <strong>{{ filteredRetakeCount() }}</strong>
-    </p-card>
-  </section>
+  <p-card styleClass="delay-summary-card">
+    <div class="search-card__head">
+      <h2>Certificate Expiry Overview</h2>
+      <span class="search-card__subtitle">Click a plant bucket to filter inspectors by expiry window</span>
+    </div>
+    <div class="table-container">
+      <div class="status-table-wrapper">
+        <table class="status-table">
+          <thead>
+            <tr>
+              <th class="col-plant text-left">Plant</th>
+              <th class="col-delay text-center">Delay</th>
+              <th class="col-d7 text-center">D7</th>
+              <th class="col-d15 text-center">D15</th>
+              <th class="col-d30 text-center">D30</th>
+              <th class="col-complete text-center">Complete</th>
+              <th class="col-total text-center">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (stat of remainingStatuses(); track stat.plant) {
+              <tr>
+                <td class="col-plant font-bold">{{ stat.plant }}</td>
+                <td
+                  class="col-delay text-center cursor-pointer"
+                  [class.active-cell]="appliedRemainingPlant() === stat.plant && appliedRemainingCategory() === 'Delay'"
+                  (click)="toggleRemainingFilter(stat.plant, 'Delay')"
+                >
+                  {{ stat.delay }}
+                </td>
+                <td
+                  class="col-d7 text-center cursor-pointer"
+                  [class.active-cell]="appliedRemainingPlant() === stat.plant && appliedRemainingCategory() === 'D7'"
+                  (click)="toggleRemainingFilter(stat.plant, 'D7')"
+                >
+                  {{ stat.d7 }}
+                </td>
+                <td
+                  class="col-d15 text-center cursor-pointer"
+                  [class.active-cell]="appliedRemainingPlant() === stat.plant && appliedRemainingCategory() === 'D15'"
+                  (click)="toggleRemainingFilter(stat.plant, 'D15')"
+                >
+                  {{ stat.d15 }}
+                </td>
+                <td
+                  class="col-d30 text-center cursor-pointer"
+                  [class.active-cell]="appliedRemainingPlant() === stat.plant && appliedRemainingCategory() === 'D30'"
+                  (click)="toggleRemainingFilter(stat.plant, 'D30')"
+                >
+                  {{ stat.d30 }}
+                </td>
+                <td
+                  class="col-complete text-center cursor-pointer"
+                  [class.active-cell]="appliedRemainingPlant() === stat.plant && appliedRemainingCategory() === 'Complete'"
+                  (click)="toggleRemainingFilter(stat.plant, 'Complete')"
+                >
+                  {{ stat.complete }}
+                </td>
+                <td
+                  class="col-total text-center cursor-pointer"
+                  [class.active-cell]="appliedRemainingPlant() === stat.plant && appliedRemainingCategory() === 'Total'"
+                  (click)="toggleRemainingFilter(stat.plant, 'Total')"
+                >
+                  {{ stat.total }}
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="row-total font-bold">
+              <td class="col-plant">TOTAL</td>
+              <td
+                class="col-delay text-center cursor-pointer"
+                [class.active-cell]="appliedRemainingPlant() === 'TOTAL' && appliedRemainingCategory() === 'Delay'"
+                (click)="toggleRemainingFilter('TOTAL', 'Delay')"
+              >
+                {{ totalRemainingStatus().delay }}
+              </td>
+              <td
+                class="col-d7 text-center cursor-pointer"
+                [class.active-cell]="appliedRemainingPlant() === 'TOTAL' && appliedRemainingCategory() === 'D7'"
+                (click)="toggleRemainingFilter('TOTAL', 'D7')"
+              >
+                {{ totalRemainingStatus().d7 }}
+              </td>
+              <td
+                class="col-d15 text-center cursor-pointer"
+                [class.active-cell]="appliedRemainingPlant() === 'TOTAL' && appliedRemainingCategory() === 'D15'"
+                (click)="toggleRemainingFilter('TOTAL', 'D15')"
+              >
+                {{ totalRemainingStatus().d15 }}
+              </td>
+              <td
+                class="col-d30 text-center cursor-pointer"
+                [class.active-cell]="appliedRemainingPlant() === 'TOTAL' && appliedRemainingCategory() === 'D30'"
+                (click)="toggleRemainingFilter('TOTAL', 'D30')"
+              >
+                {{ totalRemainingStatus().d30 }}
+              </td>
+              <td
+                class="col-complete text-center cursor-pointer"
+                [class.active-cell]="appliedRemainingPlant() === 'TOTAL' && appliedRemainingCategory() === 'Complete'"
+                (click)="toggleRemainingFilter('TOTAL', 'Complete')"
+              >
+                {{ totalRemainingStatus().complete }}
+              </td>
+              <td
+                class="col-total text-center cursor-pointer"
+                [class.active-cell]="appliedRemainingPlant() === 'TOTAL' && appliedRemainingCategory() === 'Total'"
+                (click)="toggleRemainingFilter('TOTAL', 'Total')"
+              >
+                {{ totalRemainingStatus().total }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </p-card>
 
   <p-card styleClass="search-card">
     <div class="search-card__head">
       <h2>Search & Filter</h2>
-      <p>Refine the employee roster by department, certification, exam status, and employee information.</p>
     </div>
 
     <div class="search-grid">
@@ -38,37 +138,37 @@
       </label>
 
       <label class="search-field">
-        <span>Certification</span>
+        <span>Plant</span>
         <p-select
-          [options]="certificationOptions()"
+          [options]="plantOptions()"
           optionLabel="label"
           optionValue="value"
-          [(ngModel)]="draftCertification"
-          placeholder="All certifications"
+          [(ngModel)]="draftPlant"
+          placeholder="All plants"
           styleClass="search-select"
         />
       </label>
 
       <label class="search-field">
-        <span>Exam status</span>
+        <span>Detail Process</span>
         <p-select
-          [options]="examStatusOptions()"
+          [options]="detailProcessOptions()"
           optionLabel="label"
           optionValue="value"
-          [(ngModel)]="draftExamStatus"
-          placeholder="All statuses"
+          [(ngModel)]="draftDetailProcess"
+          placeholder="All detail processes"
           styleClass="search-select"
         />
       </label>
 
       <label class="search-field">
-        <span>Expiry year</span>
+        <span>Certificate Status</span>
         <p-select
-          [options]="expiryYearOptions()"
+          [options]="certificateStatusOptions()"
           optionLabel="label"
           optionValue="value"
-          [(ngModel)]="draftExpiryYear"
-          placeholder="All years"
+          [(ngModel)]="draftCertificateStatus"
+          placeholder="All certificate statuses"
           styleClass="search-select"
         />
       </label>
@@ -76,23 +176,18 @@
 
     <div class="search-bar">
       <label class="search-field search-field--wide">
-        <span>Search by employee info</span>
+        <span>Search by inspector info</span>
         <input
           pInputText
           [(ngModel)]="draftKeyword"
           class="search-input"
           type="text"
-          placeholder="Knox ID, employee ID, name, department, certification"
+          placeholder="EID, Knox ID, name, team, product, certificate no"
         />
       </label>
 
       <div class="search-actions">
-        <p-button
-          label="Search"
-          icon="pi pi-search"
-          styleClass="search-btn"
-          (click)="applyFilters()"
-        />
+        <p-button label="Search" icon="pi pi-search" styleClass="search-btn" (click)="applyFilters()" />
         <p-button
           label="Reset"
           icon="pi pi-refresh"
@@ -108,64 +203,537 @@
   <p-card styleClass="table-card">
     <div class="table-card__head">
       <h2>Employees</h2>
-      <p>
-        @if (userRole() === 'super_admin') {
-          Employees assigned to internal examinations across all parts.
-        } @else {
-          Employees assigned to internal examinations in your part.
-        }
-      </p>
+      <p>Inspector enrollment and certification status based on the latest business snapshot.</p>
     </div>
 
     <p-table
       [value]="filteredEmployees()"
       styleClass="employee-table"
-      [tableStyle]="{ 'min-width': '48rem' }"
+      [tableStyle]="{ 'min-width': '56rem', 'table-layout': 'fixed' }"
       [paginator]="true"
       [rows]="5"
       [rowsPerPageOptions]="rowsPerPageOptions"
       paginatorDropdownAppendTo="body"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} inspectors"
       [showCurrentPageReport]="true"
     >
+      <ng-template pTemplate="colgroup">
+        <colgroup>
+          <col style="width: 3%" />
+          <col style="width: 33%" />
+          <col style="width: 17%" />
+          <col style="width: 17%" />
+          <col style="width: 17%" />
+          <col style="width: 8%" />
+        </colgroup>
+      </ng-template>
+
       <ng-template pTemplate="header">
         <tr>
-          <th>Employee</th>
-          <th>Department</th>
-          <th>Certification</th>
-          <th>Exam status</th>
-          <th>Expiry date</th>
+          <th>No</th>
+          <th>Inspector</th>
+          <th>Exam</th>
+          <th>Certificate</th>
+          <th>Approval</th>
+          <th style="white-space: nowrap">Remaining Days</th>
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-item>
-        <tr>
+      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <tr class="cursor-pointer" (click)="openCertDialog(item)">
+          <td>{{ rowIndex + 1 }}</td>
           <td>
             <div class="employee-primary">
               <strong>{{ item.name }}</strong>
-              <span>{{ item.id }}</span>
+              <div class="employee-meta-grid">
+                <span class="employee-meta-line"><span class="employee-meta-label">EID:</span><span class="employee-meta-value">{{ item.id }}</span></span>
+                <span class="employee-meta-line"><span class="employee-meta-label">Knox ID:</span><span class="employee-meta-value">{{ item.knoxId }}</span></span>
+                <span class="employee-meta-line"><span class="employee-meta-label">Department:</span><span class="employee-meta-value">{{ item.department }}</span></span>
+                <span class="employee-meta-line"><span class="employee-meta-label">Team:</span><span class="employee-meta-value">{{ item.team }}</span></span>
+                <span class="employee-meta-line"><span class="employee-meta-label">Plant:</span><span class="employee-meta-value">{{ item.plant }}</span></span>
+                <span class="employee-meta-line"><span class="employee-meta-label">Product:</span><span class="employee-meta-value">{{ item.product }}</span></span>
+                <span class="employee-meta-line">
+                  <span class="employee-meta-label">Process/Detail Process:</span>
+                  <span class="employee-meta-value">{{ item.process }} / {{ item.detailProcess }}</span>
+                </span>
+                <span class="employee-meta-line">
+                  <span class="employee-meta-label">Enter Date:</span>
+                  <span class="employee-meta-value">{{ item.enterDate | date: 'dd-MM-yyyy' }}</span>
+                </span>
+              </div>
             </div>
           </td>
-          <td>{{ item.department }}</td>
           <td>
-            <span class="meta-pill">{{ item.certification }}</span>
+            <div class="employee-cell-stack">
+              <div class="employee-cell-details">
+                <span class="employee-inline-pair">
+                  <span class="cell-label">File</span>
+                  <span
+                    class="exam-code-link"
+                    [title]="examFileName(item)"
+                    (click)="openExamFileActions(item, $event)"
+                  >
+                    <i class="pi pi-file-pdf"></i>
+                    {{ item.examCode }}
+                  </span>
+                </span>
+                <span class="employee-inline-pair">
+                  <span class="cell-label">Date</span>
+                  <strong class="employee-nowrap">{{ item.examDate | date: 'dd-MM-yyyy' }}</strong>
+                </span>
+                <span class="employee-inline-pair">
+                  <span class="cell-label">Score</span>
+                  <strong class="employee-nowrap">{{ formatScore(item.examScore) }}/{{ item.passingScore }}</strong>
+                </span>
+              </div>
+              <p-tag class="employee-status-tag" [value]="statusLabel(item.examResultStatus)" [severity]="examStatusSeverity(item.examResultStatus)" />
+            </div>
           </td>
           <td>
-            <p-tag
-              [value]="item.examStatus"
-              [icon]="statusIcon(item.examStatus)"
-              [severity]="statusSeverity(item.examStatus)"
-            />
+            <div class="employee-cell-stack">
+              <div class="employee-cell-details">
+                <span class="employee-inline-pair">
+                  <span class="cell-label">File</span>
+                  @if (hasCertFile(item)) {
+                    <span
+                      class="cert-number-badge cert-number-badge--link"
+                      [title]="certFileName(item)"
+                      (click)="openCertFileActions(item, $event)"
+                    >
+                      <i class="pi pi-file-pdf"></i>
+                      {{ item.certificateNo }}
+                    </span>
+                  } @else {
+                    <span class="cert-file-pending">Waiting approval</span>
+                  }
+                </span>
+                <span class="employee-inline-pair">
+                  <span class="cell-label">No</span>
+                  <strong class="employee-nowrap">{{ item.certificateNo || '-' }}</strong>
+                </span>
+                <span class="employee-inline-pair">
+                  <span class="cell-label">Date</span>
+                  <span class="employee-meta-line employee-meta-line--nowrap">
+                    {{ item.certificateDate ? (item.certificateDate | date: 'dd-MM-yyyy') : '-' }}
+                    /
+                    {{ item.expireDate ? (item.expireDate | date: 'dd-MM-yyyy') : '-' }}
+                  </span>
+                </span>
+              </div>
+              <p-tag
+                class="employee-status-tag"
+                [value]="statusLabel(item.certificateStatus)"
+                [severity]="certificateStatusSeverity(item.certificateStatus)"
+              />
+            </div>
           </td>
-          <td>{{ item.expiry }}</td>
+          <td>
+            <div class="employee-cell-stack">
+              <div class="employee-cell-details">
+                <span
+                  class="approver-profile approver-profile--link"
+                  (click)="openApprovalPreview(item, $event)"
+                >
+                  <i class="pi pi-user"></i>
+                  {{ item.approver || '-' }}
+                </span>
+              </div>
+              <p-tag class="employee-status-tag" [value]="statusLabel(item.approvalStatus)" [severity]="approvalStatusSeverity(item.approvalStatus)" />
+            </div>
+          </td>
+
+          <td class="text-center font-bold" [ngClass]="getRemainingDaysClass(item.expireDate)">
+            {{ getRemainingDays(item.expireDate) }}
+          </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5">No employees found.</td>
+          <td colspan="6">No inspectors found.</td>
         </tr>
       </ng-template>
     </p-table>
+
+    <p-dialog
+      [(visible)]="examFileDialogVisible"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [style]="{ width: '30rem', maxWidth: '92vw' }"
+      header="Exam File Actions"
+    >
+      <div class="dialog-content" *ngIf="selectedExamFileEmployee">
+        <div class="info-section">
+          <h3 class="section-title">Saved Exam File</h3>
+          <div class="info-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+            <div class="info-item">
+              <span class="label">Inspector</span>
+              <span class="value">{{ selectedExamFileEmployee.name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Exam Code</span>
+              <span class="value">{{ selectedExamFileEmployee.examCode }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">File Status</span>
+              <span class="value">Saved</span>
+            </div>
+            <div class="info-item">
+              <span class="label">File Name</span>
+              <span class="value">{{ examFileName(selectedExamFileEmployee) }}</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:.75rem">
+            <p-button label="View Directly" icon="pi pi-eye" (click)="viewExamFileDirectly()" />
+            <p-button label="Download" icon="pi pi-download" severity="secondary" (click)="downloadExamFile()" />
+          </div>
+        </div>
+      </div>
+    </p-dialog>
+
+    <p-dialog
+      [(visible)]="certFileDialogVisible"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [style]="{ width: '30rem', maxWidth: '92vw' }"
+      header="Certificate File Actions"
+    >
+      <div class="dialog-content" *ngIf="selectedCertFileEmployee">
+        <div class="info-section">
+          <h3 class="section-title">Saved Certificate File</h3>
+          <div class="info-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 0.5rem; margin-bottom: 1.5rem;">
+            <div class="info-item">
+              <span class="label">Inspector</span>
+              <span class="value">{{ selectedCertFileEmployee.name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Certificate No</span>
+              <span class="value">{{ selectedCertFileEmployee.certificateNo }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">File Status</span>
+              <span class="value">Approved</span>
+            </div>
+            <div class="info-item">
+              <span class="label">File Name</span>
+              <span class="value">{{ certFileName(selectedCertFileEmployee) }}</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:.75rem">
+            <p-button label="View Directly" icon="pi pi-eye" (click)="viewCertFileDirectly()" />
+            <p-button label="Download" icon="pi pi-download" severity="secondary" (click)="downloadCertFile()" />
+          </div>
+        </div>
+      </div>
+    </p-dialog>
+
+    <p-dialog
+      [(visible)]="certDialogVisible"
+      [modal]="true"
+      [style]="{ width: '90vw', maxWidth: '1200px' }"
+      [draggable]="false"
+      [resizable]="false"
+      header="Inspector Certification Result"
+      styleClass="cert-result-dialog"
+    >
+      <div class="dialog-content" *ngIf="selectedEmployee">
+        <div class="info-section">
+          <h3 class="section-title">Inspector Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">EID</span>
+              <span class="value">{{ selectedEmployee.id }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Knox ID</span>
+              <span class="value">{{ selectedEmployee.knoxId }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Name</span>
+              <span class="value">{{ selectedEmployee.name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Department</span>
+              <span class="value">{{ selectedEmployee.department }} / {{ selectedEmployee.team }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Plant / Product</span>
+              <span class="value">{{ selectedEmployee.plant }} / {{ selectedEmployee.product }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Process / Detail Process</span>
+              <span class="value">{{ selectedEmployee.process }} / {{ selectedEmployee.detailProcess }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Enter Date</span>
+              <span class="value">{{ selectedEmployee.enterDate | date: 'dd-MM-yyyy' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Remark</span>
+              <span class="value">{{ selectedEmployee.remark || '-' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-section">
+          <div class="section-header">
+            <h3 class="section-title">Certification Result Snapshot</h3>
+            <p-button
+              label="Add Certification"
+              icon="pi pi-plus"
+              size="small"
+              [disabled]="isAddingCertification"
+              (click)="addCertificationRow()"
+            />
+          </div>
+          <p-table [value]="certificationRows()" styleClass="p-datatable-sm result-table">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>No.</th>
+                <th>Training</th>
+                <th>Exam</th>
+                <th>Certificate</th>
+                <th>Approval</th>
+                <th>Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+              <tr [class.result-row--draft]="row.isDraft">
+                <td class="col-index">{{ row.isDraft ? 'New' : rowIndex + 1 }}</td>
+                <td>
+                  @if (row.isDraft) {
+                    <div class="table-stack table-stack--form">
+                      <label class="stack-field">
+                        <span>Start</span>
+                        <input pInputText type="date" class="inline-input" [(ngModel)]="row.trainingStartDate" />
+                      </label>
+                      <label class="stack-field">
+                        <span>End</span>
+                        <input pInputText type="date" class="inline-input" [(ngModel)]="row.trainingEndDate" />
+                      </label>
+                    </div>
+                  } @else {
+                    <div class="timeline-range">
+                      <div class="timeline-item">
+                        <i class="pi pi-calendar timeline-icon"></i>
+                        <div class="timeline-details">
+                          <span class="timeline-kicker">Start</span>
+                          <span class="timeline-date">{{ formatDateLabel(row.trainingStartDate) }}</span>
+                        </div>
+                      </div>
+                      <div class="timeline-connector"></div>
+                      <div class="timeline-item">
+                        <i class="pi pi-calendar-times timeline-icon"></i>
+                        <div class="timeline-details">
+                          <span class="timeline-kicker">End</span>
+                          <span class="timeline-date">{{ formatDateLabel(row.trainingEndDate) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </td>
+                <td>
+                  @if (row.isDraft) {
+                    <div class="table-stack table-stack--form">
+                      <label class="stack-field">
+                        <span>Exam Code</span>
+                        <input pInputText type="text" class="inline-input" [(ngModel)]="row.examCode" placeholder="EX-SEHC-001" />
+                      </label>
+                      <label class="stack-field">
+                        <span>Date</span>
+                        <input pInputText type="date" class="inline-input" [(ngModel)]="row.examDate" />
+                      </label>
+                      <div class="stack-inline">
+                        <label class="stack-field">
+                          <span>Score</span>
+                          <input pInputText type="number" class="inline-input" [(ngModel)]="row.examScore" />
+                        </label>
+                        <label class="stack-field">
+                          <span>Pass</span>
+                          <input pInputText type="number" class="inline-input" [(ngModel)]="row.passingScore" />
+                        </label>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="exam-details-cell">
+                      <span class="exam-code-link" (click)="previewExamPdf(row.examCode, row.examDate, selectedEmployee, $event)">
+                        <i class="pi pi-file-pdf"></i>
+                        {{ row.examCode }}
+                      </span>
+                      <span class="exam-meta-date">
+                        <i class="pi pi-calendar"></i>
+                        {{ formatDateLabel(row.examDate) }}
+                      </span>
+                      <div class="score-pills-row">
+                        <span class="score-p-badge score-p-badge--score">
+                          <span class="score-lbl">Score</span>
+                          <strong class="score-val">{{ formatScore(row.examScore) }}</strong>
+                        </span>
+                        <span class="score-p-badge score-p-badge--pass">
+                          <span class="score-lbl">Pass</span>
+                          <strong class="score-val">{{ row.passingScore }}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </td>
+                <td>
+                  @if (row.isDraft) {
+                    <div class="table-stack table-stack--form">
+                      <label class="stack-field">
+                        <span>Certificate File</span>
+                        <div class="cert-upload-field">
+                          <input
+                            #draftCertFileInput
+                            id="draft-cert-file-input"
+                            type="file"
+                            class="cert-upload-input"
+                            accept=".pdf,.png,.jpg,.jpeg"
+                            (change)="onDraftCertificateFileSelected($event)"
+                          />
+                          <label class="cert-upload-dropzone" for="draft-cert-file-input">
+                            <span class="cert-upload-dropzone__icon">
+                              <i class="pi pi-cloud-upload"></i>
+                            </span>
+                            <span class="cert-upload-dropzone__content">
+                              <strong>{{ row.certificateFileName || 'Upload certificate file' }}</strong>
+                              <span>{{ row.certificateFileName ? 'Replace file' : 'PDF, PNG, JPG, JPEG' }}</span>
+                            </span>
+                          </label>
+                          <div class="cert-upload-actions">
+                            @if (row.certificateFileName) {
+                              <button
+                                pButton
+                                type="button"
+                                class="p-button-text p-button-sm cert-upload-clear"
+                                icon="pi pi-times"
+                                label="Clear"
+                                (click)="clearDraftCertificateFile(draftCertFileInput)"
+                              ></button>
+                            }
+                          </div>
+                        </div>
+                      </label>
+                      <label class="stack-field">
+                        <span>Certificate No</span>
+                        <input pInputText type="text" class="inline-input" [(ngModel)]="row.certificateNo" placeholder="CERT-XXXX" />
+                      </label>
+                      <div class="stack-inline">
+                        <label class="stack-field">
+                          <span>Cert Date</span>
+                          <input pInputText type="date" class="inline-input" [(ngModel)]="row.certificateDate" />
+                        </label>
+                        <label class="stack-field">
+                          <span>Expire</span>
+                          <input pInputText type="date" class="inline-input" [(ngModel)]="row.expireDate" />
+                        </label>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="cert-details-cell">
+                      @if (row.certificateNo) {
+                        <span
+                          class="cert-number-badge cert-number-badge--link"
+                          [title]="row.certificateNo + '.pdf'"
+                          (click)="openCertRowFileActions(row, $event)"
+                        >
+                          <i class="pi pi-file-pdf"></i>
+                          {{ row.certificateNo }}
+                        </span>
+                        <span class="cert-validity-dates">
+                          <i class="pi pi-clock"></i>
+                          {{ formatDateLabel(row.certificateDate) }} – {{ formatDateLabel(row.expireDate) }}
+                        </span>
+                        <div class="cert-status-row">
+                          <p-tag
+                            [value]="statusLabel(certificationStatusForRow(row))"
+                            [severity]="certificateStatusSeverity(certificationStatusForRow(row))"
+                          />
+                          <span class="remaining-days-capsule" [ngClass]="getRemainingDaysClass(row.expireDate)">
+                            <i class="pi pi-hourglass"></i>
+                            {{ getRemainingDays(row.expireDate) }}
+                          </span>
+                        </div>
+                        @if (row.certificateFileName) {
+                          <span class="cert-uploaded-file" [title]="row.certificateFileName">
+                            <i class="pi pi-paperclip"></i>
+                            {{ row.certificateFileName }}
+                          </span>
+                        }
+                      } @else {
+                        <span class="no-cert-value">—</span>
+                        @if (row.certificateFileName) {
+                          <span class="cert-uploaded-file" [title]="row.certificateFileName">
+                            <i class="pi pi-paperclip"></i>
+                            {{ row.certificateFileName }}
+                          </span>
+                        }
+                      }
+                    </div>
+                  }
+                </td>
+                <td>
+                  @if (row.isDraft) {
+                    <div class="table-stack table-stack--form">
+                      <label class="stack-field">
+                        <span>Status</span>
+                        <p-select
+                          [options]="approvalStatusFormOptions"
+                          optionLabel="label"
+                          optionValue="value"
+                          appendTo="body"
+                          styleClass="inline-select"
+                          [(ngModel)]="row.approvalStatus"
+                        />
+                      </label>
+                      <label class="stack-field">
+                        <span>Approver</span>
+                        <input pInputText type="text" class="inline-input" [(ngModel)]="row.approver" placeholder="Approver" />
+                      </label>
+                    </div>
+                  } @else {
+                    <div class="approval-details-cell">
+                      <span class="approver-profile">
+                        <i class="pi pi-user"></i>
+                        {{ row.approver || '-' }}
+                      </span>
+                      <p-tag [value]="statusLabel(row.approvalStatus)" [severity]="approvalStatusSeverity(row.approvalStatus)" />
+                    </div>
+                  }
+                </td>
+                <td>
+                  @if (row.isDraft) {
+                    <div class="row-actions">
+                      <p-button
+                        icon="pi pi-check"
+                        [text]="true"
+                        severity="success"
+                        [loading]="isSavingCertification"
+                        [disabled]="isSavingCertification || !canSaveCertification()"
+                        (click)="saveCertification()"
+                      />
+                      <p-button
+                        icon="pi pi-times"
+                        [text]="true"
+                        severity="secondary"
+                        [disabled]="isSavingCertification"
+                        (click)="cancelAddCertification()"
+                      />
+                    </div>
+                  } @else {
+                    <div class="row-actions">
+                      <p-button icon="pi pi-pencil" [text]="true" severity="secondary" />
+                      <p-button icon="pi pi-trash" [text]="true" severity="danger" (click)="deleteCertification(rowIndex)" />
+                    </div>
+                  }
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </p-dialog>
   </p-card>
 </div>

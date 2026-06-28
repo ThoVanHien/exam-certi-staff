@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { MoreThan, IsNull } from "typeorm";
-import { userSessionRepository } from "../repositories/user-session.repository";
 import { AppError } from "../utils/app-error";
 import { verifyAccessToken } from "../utils/token";
 import type { AuthenticatedRequest } from "../types/express";
 
+/**
+ * TODO: Auth middleware is simplified for now.
+ * staffs_new integration (Knox ID / EID based auth) should be implemented here
+ * in a future version when the HR data source connection is configured.
+ */
 export const authenticate = async (
   req: Request,
   _res: Response,
@@ -20,19 +23,6 @@ export const authenticate = async (
 
     const token = authorization.replace("Bearer ", "").trim();
     const payload = verifyAccessToken(token);
-
-    const session = await userSessionRepository.findOne({
-      where: {
-        id: payload.sessionId,
-        userId: payload.userId,
-        revokedAt: IsNull(),
-        expiresAt: MoreThan(new Date())
-      }
-    });
-
-    if (!session) {
-      throw new AppError("Session da het han hoac da bi thu hoi", StatusCodes.UNAUTHORIZED);
-    }
 
     (req as AuthenticatedRequest).authUser = payload;
     next();

@@ -55,6 +55,7 @@ export class DashboardPageComponent {
   readonly navigate = output<DashboardSection>();
   readonly logout = output<void>();
   readonly startExam = output<number>();
+  readonly deleteExam = output<number>();
   readonly finishExam = output<void>();
 
   protected onThemeChange(theme: 'dark' | 'light'): void {

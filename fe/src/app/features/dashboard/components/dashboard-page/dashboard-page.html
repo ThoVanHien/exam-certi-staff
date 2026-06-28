@@ -20,6 +20,7 @@
     @if (selectedSection() === 'employees') {
       <app-employee-overview
         [employees]="employees()"
+        [authSession]="auth()"
         [passedCount]="passedCount()"
         [scheduledCount]="scheduledCount()"
         [retakeCount]="retakeCount()"
@@ -29,7 +30,9 @@
       <app-exam-overview
         [exams]="exams()"
         [userRole]="auth().user.role"
+        [currentTheme]="currentTheme()"
         (startExam)="startExam.emit($event)"
+        (deleteExamApi)="deleteExam.emit($event)"
       />
     } @else if (selectedSection() === 'take-exam') {
       <app-exam-taking
@@ -297,6 +300,7 @@
     } @else {
       <app-employee-overview
         [employees]="employees()"
+        [authSession]="auth()"
         [passedCount]="passedCount()"
         [scheduledCount]="scheduledCount()"
         [retakeCount]="retakeCount()"

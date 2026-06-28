@@ -25,7 +25,6 @@ export class DashboardSidebarComponent {
       tooltip: this.isCollapsed() ? item.label : undefined,
       tooltipPosition: 'right',
       styleClass: item.active ? 'nav-item--active' : '',
-      hint: item.hint,
     })),
   );
 

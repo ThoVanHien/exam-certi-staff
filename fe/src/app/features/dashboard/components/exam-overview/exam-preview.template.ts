@@ -19,6 +19,12 @@ export interface ExamPreviewQuestion {
 
 export interface ExamPreviewDraft {
   description: string;
+  employeeName?: string;
+  employeeEid?: string;
+  employeeKnoxId?: string;
+  employeeDepartment?: string;
+  employeeTeam?: string;
+  examDate?: string;
   questions: ExamPreviewQuestion[];
 }
 
@@ -39,7 +45,7 @@ function escapeHtml(value: string): string {
  * Open the result in a new browser tab via `document.write()`.
  * Users can print or save as PDF directly from the toolbar in the page.
  */
-export function buildExamPreviewHtml(draft: ExamPreviewDraft, item: ExamItem): string {
+export function buildExamPreviewHtml(draft: ExamPreviewDraft, item: ExamItem, theme: 'light' | 'dark' = 'dark'): string {
   const statusColor: Record<string, string> = {
     Published: '#22c55e',
     Draft: '#f59e0b',
@@ -54,6 +60,19 @@ export function buildExamPreviewHtml(draft: ExamPreviewDraft, item: ExamItem): s
   const color = statusColor[item.status] ?? '#6b7280';
   const bg = statusBg[item.status] ?? 'rgba(107,114,128,0.12)';
   const description = escapeHtml(draft.description || item.description || 'No description provided.');
+  const employeeMetaRows = [
+    draft.employeeName ? `<div class="meta-row"><strong>Inspector:</strong> ${escapeHtml(draft.employeeName)}</div>` : '',
+    draft.employeeEid ? `<div class="meta-row"><strong>EID:</strong> ${escapeHtml(draft.employeeEid)}</div>` : '',
+    draft.employeeKnoxId ? `<div class="meta-row"><strong>Knox ID:</strong> ${escapeHtml(draft.employeeKnoxId)}</div>` : '',
+    draft.employeeDepartment || draft.employeeTeam
+      ? `<div class="meta-row"><strong>Dept/Team:</strong> ${escapeHtml(
+          [draft.employeeDepartment, draft.employeeTeam].filter(Boolean).join(' / '),
+        )}</div>`
+      : '',
+    draft.examDate ? `<div class="meta-row"><strong>Exam Date:</strong> ${escapeHtml(draft.examDate)}</div>` : '',
+  ]
+    .filter(Boolean)
+    .join('');
 
   const questionsHtml = draft.questions
     .map((question, index) => {
@@ -271,6 +290,47 @@ export function buildExamPreviewHtml(draft: ExamPreviewDraft, item: ExamItem): s
     .btn-print { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
     .btn-close { background: rgba(255,255,255,0.08); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1) !important; }
 
+    ${theme === 'light' ? `
+    /* ── Light Theme Overrides ── */
+    body { background: #f1f5f9; color: #0f172a; }
+    .header {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .header::before { background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%); }
+    .header__title { -webkit-text-fill-color: #0f172a; color: #0f172a; background: none; }
+    .header__desc { color: #475569; }
+    .meta-row { color: #475569; }
+    .meta-row strong { color: #0f172a; }
+    .question {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+    }
+    .question:hover { border-color: #94a3b8; }
+    .question__prompt { color: #1e293b; }
+    .q-image { border-color: #e2e8f0; }
+    .q-image img { background: #f8fafc; }
+    .answer { background: #f8fafc; border: 1px solid #e2e8f0; }
+    .answer__text { color: #334155; }
+    .answer__badge {
+      background: #ffffff;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .answer--correct { background: #f0fdf4; border-color: #bbf7d0; }
+    .answer--correct .answer__text { color: #15803d; font-weight: 500; }
+    .a-image { border-color: #e2e8f0; }
+    .a-image img { background: #f8fafc; }
+    .btn-close {
+      background: #ffffff;
+      color: #475569;
+      border: 1px solid #cbd5e1 !important;
+    }
+    .btn-close:hover { background: #f1f5f9; }
+    ` : ''}
+
     /* ── Print styles ── */
     @media print {
       body { background: #fff; color: #111; padding: 0; }
@@ -316,6 +376,7 @@ export function buildExamPreviewHtml(draft: ExamPreviewDraft, item: ExamItem): s
         <div class="meta-row"><strong>Code:</strong> ${escapeHtml(item.code)}</div>
         <div class="meta-row"><strong>Dept:</strong> ${escapeHtml(item.department)}</div>
         <div class="meta-row"><strong>By:</strong> ${escapeHtml(item.createdBy)}</div>
+        ${employeeMetaRows}
       </div>
     </div>
 

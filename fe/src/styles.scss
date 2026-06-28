@@ -234,3 +234,54 @@ body:has(.theme-light) .exam-delete-dialog .p-dialog-footer {
 .p-overlay-mask {
   backdrop-filter: blur(4px);
 }
+
+// Dimmer placeholders globally
+::placeholder,
+.p-placeholder,
+.p-inputtext::placeholder,
+.p-select-label.p-placeholder,
+.p-dropdown-label.p-placeholder {
+  color: var(--color-text-secondary) !important;
+  opacity: 0.4 !important;
+}
+
+// Light Mode Overrides for Account Popover
+html.theme-light .account-card {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(203, 213, 225, 0.92) !important;
+  box-shadow: 0 24px 48px -12px rgba(100, 116, 139, 0.22) !important;
+}
+
+html.theme-light .account-card__header {
+  background: rgba(248, 250, 252, 0.98) !important;
+  border-bottom-color: rgba(203, 213, 225, 0.92) !important;
+}
+
+html.theme-light .account-card__avatar {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(2, 132, 199, 0.08)) !important;
+  border-color: rgba(14, 165, 233, 0.2) !important;
+  color: #0284c7 !important;
+}
+
+html.theme-light .account-card__identity strong {
+  color: #0f172a !important;
+}
+
+html.theme-light .account-card__identity span {
+  background: rgba(14, 165, 233, 0.1) !important;
+  border-color: rgba(14, 165, 233, 0.15) !important;
+  color: #0284c7 !important;
+}
+
+html.theme-light .account-card__row {
+  background: rgba(241, 245, 249, 0.6) !important;
+  border-color: rgba(226, 232, 240, 0.8) !important;
+}
+
+html.theme-light .account-card__label {
+  color: #64748b !important;
+}
+
+html.theme-light .account-card__value {
+  color: #1e293b !important;
+}

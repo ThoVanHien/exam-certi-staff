@@ -1,11 +1,17 @@
 import { DataSource } from "typeorm";
 import { env } from "./env";
-import { User } from "../entities/user.entity";
-import { Certificate } from "../entities/certificate.entity";
+import { Plant } from "../entities/plant.entity";
+import { InspectionProcess } from "../entities/process.entity";
+import { DetailProcess } from "../entities/detail-process.entity";
+import { Inspector } from "../entities/inspector.entity";
 import { Exam } from "../entities/exam.entity";
 import { ExamQuestion } from "../entities/exam-question.entity";
 import { ExamResult } from "../entities/exam-result.entity";
-import { UserSession } from "../entities/user-session.entity";
+import { ExamResultAnswer } from "../entities/exam-result-answer.entity";
+import { CertificateResult } from "../entities/certificate-result.entity";
+import { ApprovalRequest } from "../entities/approval-request.entity";
+import { History } from "../entities/history.entity";
+import { StaffNew } from "../entities/staff-new.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -21,5 +27,18 @@ export const AppDataSource = new DataSource({
   database: env.DB_NAME,
   synchronize: env.DB_SYNC,
   logging: env.DB_LOGGING,
-  entities: [User, Certificate, Exam, ExamQuestion, ExamResult, UserSession]
+  entities: [
+    Plant,
+    InspectionProcess,
+    DetailProcess,
+    Inspector,
+    Exam,
+    ExamQuestion,
+    ExamResult,
+    ExamResultAnswer,
+    CertificateResult,
+    ApprovalRequest,
+    History,
+    StaffNew
+  ]
 });

@@ -19,7 +19,7 @@ const envSchema = z.object({
   CERT_STORAGE_PATH: z.string().min(1),
   MAX_FILE_SIZE: z.coerce.number().int().positive().default(10 * 1024 * 1024),
   JWT_ACCESS_SECRET: z.string().min(32),
-  JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
+  JWT_ACCESS_EXPIRES_IN: z.string().default("120m"),
   JWT_REFRESH_EXPIRES_IN_DAYS: z.coerce.number().int().positive().default(7)
 });
 

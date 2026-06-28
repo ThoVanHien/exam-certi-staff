@@ -62,7 +62,7 @@
 .nav-item {
   appearance: none;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-3);
   width: 100%;
   text-align: left;
@@ -109,12 +109,7 @@
   font-weight: 600;
 }
 
-.nav-item__copy span {
-  display: block;
-  margin-top: var(--space-2);
-  color: var(--text-panel-secondary);
-  font-size: var(--font-size-xs);
-}
+
 
 .nav-item:hover,
 .nav-item:focus-visible {

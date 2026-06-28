@@ -1,11 +1,13 @@
+import { DOCUMENT } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { employeeItems, examItems, navigationItems } from './core/data/dashboard.data';
+import { examItems, navigationItems } from './core/data/dashboard.data';
 import { LoginResponse } from './core/models/auth.model';
 import { DashboardSection, EmployeeItem, ExamItem, NavItem } from './core/models/dashboard.model';
 import { LoginPanelComponent } from './features/auth/components/login-panel/login-panel';
 import { DashboardPageComponent } from './features/dashboard/components/dashboard-page/dashboard-page';
+import { DashboardService } from './core/services/dashboard.service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +18,8 @@ import { DashboardPageComponent } from './features/dashboard/components/dashboar
 export class App {
   private readonly fb = inject(FormBuilder);
   private readonly http = inject(HttpClient);
+  private readonly document = inject(DOCUMENT);
+  private readonly dashboardService = inject(DashboardService);
 
   protected readonly apiBaseUrl = 'http://localhost:3000/api';
   protected readonly currentTheme = signal<'dark' | 'light'>('dark');
@@ -29,7 +33,7 @@ export class App {
   protected readonly certTemplate = signal<{ exists: boolean; url?: string } | null>(null);
   protected readonly isUploadingTemplate = signal(false);
   protected readonly activeExamId = signal<number | null>(null);
-  protected readonly employeeItems = employeeItems;
+  protected readonly employeeItems = signal<EmployeeItem[]>([]);
   protected readonly examItems = examItems;
   protected readonly navigationItems = computed<NavItem[]>(() => {
     const user = this.loginResult()?.user;
@@ -38,23 +42,18 @@ export class App {
       .filter((item) => !(isEmp && item.key === 'employees'))
       .map((item) => {
         let label = item.label;
-        let hint = item.hint;
         if (isEmp) {
           if (item.key === 'examinations') {
             label = 'My Exams';
-            hint = 'Take assigned assessments';
           } else if (item.key === 'certificates') {
             label = 'My Certificates';
-            hint = 'View my certifications';
           } else if (item.key === 'results') {
             label = 'My Results';
-            hint = 'View my exam history';
           }
         }
         return {
           ...item,
           label,
-          hint,
           active: item.key === this.selectedSection(),
         };
       });
@@ -64,6 +63,27 @@ export class App {
     email: ['admin@company.local', [Validators.required, Validators.email]],
     password: ['admin', [Validators.required]],
   });
+
+  constructor() {
+    const hash = window.location.hash.replace('#/', '').replace('#', '');
+    if (['employees', 'examinations', 'certificates', 'results'].includes(hash)) {
+      this.selectedSection.set(hash as DashboardSection);
+    }
+    
+    // Apply initial theme
+    this.applyThemeClass(this.currentTheme());
+  }
+
+  private applyThemeClass(theme: 'dark' | 'light'): void {
+    const root = this.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-light');
+    } else {
+      root.classList.add('theme-light');
+      root.classList.remove('theme-dark');
+    }
+  }
 
   private loadExams(token: string): void {
     this.http
@@ -113,6 +133,18 @@ export class App {
       });
   }
 
+  private loadEmployees(token: string): void {
+    this.dashboardService.getEmployees(token).subscribe({
+      next: (data) => {
+        this.employeeItems.set(data);
+      },
+      error: (err) => {
+        console.error('App: loadEmployees failed:', err);
+        this.employeeItems.set([]);
+      }
+    });
+  }
+
   protected uploadTemplateFile(file: File): void {
     const auth = this.loginResult();
     if (!auth) return;
@@ -154,13 +186,19 @@ export class App {
           this.loginResult.set(response.data);
           this.isSubmitting.set(false);
           if (response.data.user.role === 'employee') {
-            this.selectedSection.set('examinations');
+            this.setSection('examinations');
           } else {
-            this.selectedSection.set('employees');
+            const hash = window.location.hash.replace('#/', '').replace('#', '');
+            if (['employees', 'examinations', 'certificates', 'results'].includes(hash)) {
+              this.setSection(hash as DashboardSection);
+            } else {
+              this.setSection('employees');
+            }
           }
           this.loadExams(response.data.accessToken);
           this.loadMyResults(response.data.accessToken);
           this.loadCertTemplate(response.data.accessToken);
+          this.loadEmployees(response.data.accessToken);
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage.set(error.error?.message || 'Unable to sign in. Please try again.');
@@ -190,11 +228,11 @@ export class App {
     }
 
     if (auth.user.role === 'super_admin') {
-      return this.employeeItems;
+      return this.employeeItems();
     }
 
     if (auth.user.role === 'partleader') {
-      return this.employeeItems.filter((item) => item.department === auth.user.department);
+      return this.employeeItems().filter((item) => item.department === auth.user.department);
     }
 
     return [];
@@ -213,30 +251,22 @@ export class App {
       title: e.title,
       description: e.description || 'No description provided.',
       department: e.department || 'Production',
-      createdBy: e.createdByUser?.name || 'admin',
-      questionCount: e.totalQuestions || 0,
-      durationMinutes: e.duration || 30,
-      status: 'Published' as const,
+      createdBy: e.createdByUser?.name || e.createdBy || 'admin',
+      questionCount: e.questionCount || e.totalQuestions || 0,
+      durationMinutes: e.durationMinutes || e.duration || 30,
+      status: e.status || 'Published',
     }));
 
-    if (auth.user.role === 'employee') {
+    if (auth.user.role === 'super_admin') {
       return bExams;
     }
 
-    // Merge backend exams and local mock exams for admins/partleaders
-    const merged = [...bExams];
-    for (const mock of this.examItems) {
-      if (!merged.some((e) => e.id === mock.id || e.title === mock.title)) {
-        merged.push(mock);
-      }
-    }
-
-    if (auth.user.role === 'super_admin') {
-      return merged;
-    }
-
     if (auth.user.role === 'partleader') {
-      return merged.filter((item) => item.department === auth.user.department);
+      return bExams.filter((item) => item.department === auth.user.department);
+    }
+
+    if (auth.user.role === 'employee') {
+      return bExams;
     }
 
     return [];
@@ -295,19 +325,20 @@ export class App {
   }
 
   protected get passedCount(): number {
-    return this.visibleEmployees.filter((item) => item.examStatus === 'Passed').length;
+    return this.visibleEmployees.filter((item) => item.examResultStatus === 'PASSED').length;
   }
 
   protected get scheduledCount(): number {
-    return this.visibleEmployees.filter((item) => item.examStatus === 'Scheduled').length;
+    return this.visibleEmployees.filter((item) => item.approvalStatus === 'WAITING_APPROVAL').length;
   }
 
   protected get retakeCount(): number {
-    return this.visibleEmployees.filter((item) => item.examStatus === 'Retake').length;
+    return this.visibleEmployees.filter((item) => item.examResultStatus === 'FAILED').length;
   }
 
   protected setTheme(theme: 'dark' | 'light'): void {
     this.currentTheme.set(theme);
+    this.applyThemeClass(theme);
   }
 
   protected toggleSidebar(): void {
@@ -316,6 +347,8 @@ export class App {
 
   protected setSection(section: DashboardSection): void {
     this.selectedSection.set(section);
+    window.history.pushState(null, '', '#/' + section);
+    
     if (section === 'results') {
       const auth = this.loginResult();
       if (auth) {
@@ -325,6 +358,11 @@ export class App {
       const auth = this.loginResult();
       if (auth) {
         this.loadCertTemplate(auth.accessToken);
+      }
+    } else if (section === 'employees') {
+      const auth = this.loginResult();
+      if (auth) {
+        this.loadEmployees(auth.accessToken);
       }
     }
   }
@@ -344,6 +382,25 @@ export class App {
       this.loadExams(auth.accessToken);
       this.loadMyResults(auth.accessToken);
       this.loadCertTemplate(auth.accessToken);
+      this.loadEmployees(auth.accessToken);
     }
+  }
+
+  protected deleteExam(examId: number): void {
+    const auth = this.loginResult();
+    if (!auth) return;
+
+    this.http
+      .delete<{ success: boolean }>(`${this.apiBaseUrl}/exams/${examId}`, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` },
+      })
+      .subscribe({
+        next: () => {
+          this.loadExams(auth.accessToken);
+        },
+        error: (err) => {
+          console.error('App: deleteExam failed:', err);
+        }
+      });
   }
 }

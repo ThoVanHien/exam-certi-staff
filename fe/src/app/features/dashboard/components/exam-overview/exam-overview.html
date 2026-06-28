@@ -1,465 +1,318 @@
 <div class="workspace__content">
   @if (editorMode() !== 'list') {
-    <p-card styleClass="composer-card">
-      <div class="composer-card__head">
-        <div>
-          <p class="composer-card__eyebrow">Exam Builder</p>
-          <h2>{{ editorTitle() }}</h2>
-          <p>{{ editorDescription() }}</p>
+  <p-card styleClass="composer-card">
+    <div class="composer-card__head">
+      <div>
+        <p class="composer-card__eyebrow">Exam Builder</p>
+        <h2>{{ editorTitle() }}</h2>
+        <p>{{ editorDescription() }}</p>
+      </div>
+
+      <div class="composer-card__head-actions">
+        <label class="pdf-import-trigger" [class.pdf-import-trigger--busy]="isImportingPdf()">
+          <input type="file" accept="application/pdf,image/png,image/jpeg,image/webp"
+            (change)="onImportSourceSelected($event)" />
+          <span>{{ isImportingPdf() ? 'Importing...' : 'Import PDF / Image' }}</span>
+        </label>
+        <button type="button" class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
+          title="Back to exams" aria-label="Back to exams" (click)="returnToListPage()"
+          style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;">
+          <span class="p-button-icon pi pi-arrow-left" aria-hidden="true"
+            style="color: var(--text-panel); font-size: 1rem;"></span>
+        </button>
+        <button type="button" class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
+          title="Preview PDF" aria-label="Preview PDF" (click)="previewCurrentDraftPdf()"
+          style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;">
+          <span class="p-button-icon pi pi-file-pdf" aria-hidden="true"
+            style="color: var(--text-panel); font-size: 1rem;"></span>
+        </button>
+        <button type="button" class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
+          [title]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
+          [aria-label]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'" (click)="saveExam('Draft')"
+          style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;">
+          <span class="p-button-icon pi pi-save" aria-hidden="true"
+            style="color: var(--text-panel); font-size: 1rem;"></span>
+        </button>
+        <button type="button" class="search-btn exam-icon-btn p-button p-component p-button-icon-only"
+          [title]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
+          [aria-label]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'" (click)="saveExam('Published')"
+          style="cursor: pointer; border: none; background: linear-gradient(135deg, var(--button-primary-start) 0%, var(--button-primary-end) 100%); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;">
+          <span class="p-button-icon pi pi-send" aria-hidden="true"
+            style="color: var(--button-primary-text); font-size: 1rem;"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="composer-grid">
+      <label class="search-field">
+        <span>Exam code</span>
+        <input pInputText [ngModel]="examDraft().code" (ngModelChange)="updateDraftField('code', $event)"
+          class="search-input" type="text" placeholder="EX-204" />
+      </label>
+
+      <label class="search-field search-field--wide">
+        <span>Exam title</span>
+        <input pInputText [ngModel]="examDraft().title" (ngModelChange)="updateDraftField('title', $event)"
+          class="search-input" type="text" placeholder="Electrical Safety Annual Assessment" />
+      </label>
+    </div>
+
+    <div class="composer-stack">
+      <label class="search-field">
+        <span>Description</span>
+        <textarea [ngModel]="examDraft().description" (ngModelChange)="updateDraftField('description', $event)"
+          class="composer-textarea" rows="3"
+          placeholder="Short summary for exam roster, dashboard card, and approvals."></textarea>
+      </label>
+
+      @if (importSummary()) {
+      <div class="import-summary">
+        {{ importSummary() }}
+      </div>
+      }
+
+      @if (importDebug()) {
+      <div class="import-debug">
+        {{ importDebug() }}
+      </div>
+      }
+    </div>
+
+    <div class="question-stack">
+      @for (question of examDraft().questions; track question.id; let index = $index) {
+      <article class="question-card">
+        <div class="question-card__head">
+          <div>
+            <p class="question-card__eyebrow">Question {{ index + 1 }}</p>
+          </div>
+
+          @if (examDraft().questions.length > 1) {
+          <p-button icon="pi pi-trash" styleClass="reset-btn exam-icon-btn question-card__remove"
+            ariaLabel="Remove question" title="Remove question" (click)="removeQuestion(question.id)" />
+          }
         </div>
 
-        <div class="composer-card__head-actions">
-          <label class="pdf-import-trigger" [class.pdf-import-trigger--busy]="isImportingPdf()">
-            <input
-              type="file"
-              accept="application/pdf,image/png,image/jpeg,image/webp"
-              (change)="onImportSourceSelected($event)"
-            />
-            <span>{{ isImportingPdf() ? 'Importing...' : 'Import PDF / Image' }}</span>
-          </label>
-          <button
-            type="button"
-            class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
-            title="Back to exams"
-            aria-label="Back to exams"
-            (click)="returnToListPage()"
-            style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
-          >
-            <span class="p-button-icon pi pi-arrow-left" aria-hidden="true" style="color: var(--text-panel); font-size: 1rem;"></span>
-          </button>
-          <button
-            type="button"
-            class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
-            title="Preview PDF"
-            aria-label="Preview PDF"
-            (click)="previewCurrentDraftPdf()"
-            style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
-          >
-            <span class="p-button-icon pi pi-file-pdf" aria-hidden="true" style="color: var(--text-panel); font-size: 1rem;"></span>
-          </button>
-          <button
-            type="button"
-            class="reset-btn exam-icon-btn p-button p-component p-button-icon-only"
-            [title]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
-            [aria-label]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
-            (click)="saveExam('Draft')"
-            style="cursor: pointer; border: 1px solid var(--button-secondary-border); background: var(--button-secondary-bg); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
-          >
-            <span class="p-button-icon pi pi-save" aria-hidden="true" style="color: var(--text-panel); font-size: 1rem;"></span>
-          </button>
-          <button
-            type="button"
-            class="search-btn exam-icon-btn p-button p-component p-button-icon-only"
-            [title]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
-            [aria-label]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
-            (click)="saveExam('Published')"
-            style="cursor: pointer; border: none; background: linear-gradient(135deg, var(--button-primary-start) 0%, var(--button-primary-end) 100%); width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 15px;"
-          >
-            <span class="p-button-icon pi pi-send" aria-hidden="true" style="color: var(--button-primary-text); font-size: 1rem;"></span>
-          </button>
+        <label class="search-field">
+          <span>Question prompt</span>
+          <div class="question-prompt-field">
+            <textarea [ngModel]="question.prompt" (ngModelChange)="updateQuestionPrompt(question.id, $event)"
+              class="composer-textarea composer-textarea--question" rows="3"
+              placeholder="Enter the full question stem here."></textarea>
+
+            <label class="question-image-trigger" [class.question-image-trigger--has-image]="!!question.imagePreview">
+              <input type="file" accept="image/*" (change)="onQuestionImageSelected($event, question.id)" />
+              <i class="pi pi-image" aria-hidden="true"></i>
+              <span class="sr-only">Upload question image</span>
+            </label>
+          </div>
+        </label>
+
+        <div class="uploader-block">
+          @if (question.imagePreview) {
+          <div class="image-preview">
+            <img [src]="question.imagePreview" [alt]="'Question ' + (index + 1) + ' image preview'" />
+            <button type="button" class="image-preview__clear" (click)="clearQuestionImage(question.id)">
+              Remove image
+            </button>
+          </div>
+          }
         </div>
-      </div>
 
-      <div class="composer-grid">
-        <label class="search-field">
-          <span>Exam code</span>
-          <input
-            pInputText
-            [ngModel]="examDraft().code"
-            (ngModelChange)="updateDraftField('code', $event)"
-            class="search-input"
-            type="text"
-            placeholder="EX-204"
-          />
-        </label>
-
-        <label class="search-field search-field--wide">
-          <span>Exam title</span>
-          <input
-            pInputText
-            [ngModel]="examDraft().title"
-            (ngModelChange)="updateDraftField('title', $event)"
-            class="search-input"
-            type="text"
-            placeholder="Electrical Safety Annual Assessment"
-          />
-        </label>
-      </div>
-
-      <div class="composer-stack">
-        <label class="search-field">
-          <span>Description</span>
-          <textarea
-            [ngModel]="examDraft().description"
-            (ngModelChange)="updateDraftField('description', $event)"
-            class="composer-textarea"
-            rows="3"
-            placeholder="Short summary for exam roster, dashboard card, and approvals."
-          ></textarea>
-        </label>
-
-        @if (importSummary()) {
-          <div class="import-summary">
-            {{ importSummary() }}
-          </div>
-        }
-
-        @if (importDebug()) {
-          <div class="import-debug">
-            {{ importDebug() }}
-          </div>
-        }
-      </div>
-
-      <div class="question-stack">
-        @for (question of examDraft().questions; track question.id; let index = $index) {
-          <article class="question-card">
-            <div class="question-card__head">
-              <div>
-                <p class="question-card__eyebrow">Question {{ index + 1 }}</p>
-              </div>
-
-              @if (examDraft().questions.length > 1) {
-                <p-button
-                  icon="pi pi-trash"
-                  styleClass="reset-btn exam-icon-btn question-card__remove"
-                  ariaLabel="Remove question"
-                  title="Remove question"
-                  (click)="removeQuestion(question.id)"
-                />
-              }
+        <div class="answer-grid">
+          @for (answer of question.answers; track answer.key) {
+          <section class="answer-card" [class.answer-card--correct]="question.correctAnswer === answer.key">
+            <div class="answer-card__head">
+              <label class="answer-card__badge answer-card__badge--selectable">
+                <input type="radio" [name]="'correct-answer-' + question.id"
+                  [checked]="question.correctAnswer === answer.key"
+                  (change)="updateQuestionCorrectAnswer(question.id, answer.key)" />
+                <span aria-hidden="true">{{ answer.key }}</span>
+                <span class="sr-only">Choose answer {{ answer.key }} as correct</span>
+              </label>
             </div>
 
             <label class="search-field">
-              <span>Question prompt</span>
-              <div class="question-prompt-field">
-                <textarea
-                  [ngModel]="question.prompt"
-                  (ngModelChange)="updateQuestionPrompt(question.id, $event)"
-                  class="composer-textarea composer-textarea--question"
-                  rows="3"
-                  placeholder="Enter the full question stem here."
-                ></textarea>
-
-                <label
-                  class="question-image-trigger"
-                  [class.question-image-trigger--has-image]="!!question.imagePreview"
-                >
-                  <input
-                    type="file"
-                    accept="image/*"
-                    (change)="onQuestionImageSelected($event, question.id)"
-                  />
-                  <i class="pi pi-image" aria-hidden="true"></i>
-                  <span class="sr-only">Upload question image</span>
-                </label>
-              </div>
+              <!-- <span>Answer {{ answer.key }}</span> -->
+              <textarea [ngModel]="answer.text" (ngModelChange)="updateAnswerText(question.id, answer.key, $event)"
+                class="composer-textarea composer-textarea--answer" rows="3"
+                placeholder="Enter answer option text."></textarea>
             </label>
 
-            <div class="uploader-block">
-              @if (question.imagePreview) {
-                <div class="image-preview">
-                  <img
-                    [src]="question.imagePreview"
-                    [alt]="'Question ' + (index + 1) + ' image preview'"
-                  />
-                  <button
-                    type="button"
-                    class="image-preview__clear"
-                    (click)="clearQuestionImage(question.id)"
-                  >
-                    Remove image
-                  </button>
-                </div>
-              }
+            <label class="answer-image-trigger" [class.answer-image-trigger--has-image]="!!answer.imagePreview">
+              <input type="file" accept="image/*" (change)="onAnswerImageSelected($event, question.id, answer.key)" />
+              <i class="pi pi-image" aria-hidden="true"></i>
+              <span class="sr-only">{{ answer.imageName || 'Add answer image' }}</span>
+            </label>
+
+            @if (answer.imagePreview) {
+            <div class="image-preview image-preview--answer">
+              <img [src]="answer.imagePreview" [alt]="'Answer ' + answer.key + ' image preview'" />
+              <button type="button" class="image-preview__clear" (click)="clearAnswerImage(question.id, answer.key)">
+                Remove image
+              </button>
             </div>
-
-            <div class="answer-grid">
-              @for (answer of question.answers; track answer.key) {
-                <section
-                  class="answer-card"
-                  [class.answer-card--correct]="question.correctAnswer === answer.key"
-                >
-                  <div class="answer-card__head">
-                    <label class="answer-card__badge answer-card__badge--selectable">
-                      <input
-                        type="radio"
-                        [name]="'correct-answer-' + question.id"
-                        [checked]="question.correctAnswer === answer.key"
-                        (change)="updateQuestionCorrectAnswer(question.id, answer.key)"
-                      />
-                      <span aria-hidden="true">{{ answer.key }}</span>
-                      <span class="sr-only">Choose answer {{ answer.key }} as correct</span>
-                    </label>
-                  </div>
-
-                  <label class="search-field">
-                    <!-- <span>Answer {{ answer.key }}</span> -->
-                    <textarea
-                      [ngModel]="answer.text"
-                      (ngModelChange)="updateAnswerText(question.id, answer.key, $event)"
-                      class="composer-textarea composer-textarea--answer"
-                      rows="3"
-                      placeholder="Enter answer option text."
-                    ></textarea>
-                  </label>
-
-                  <label
-                    class="answer-image-trigger"
-                    [class.answer-image-trigger--has-image]="!!answer.imagePreview"
-                  >
-                    <input
-                      type="file"
-                      accept="image/*"
-                      (change)="onAnswerImageSelected($event, question.id, answer.key)"
-                    />
-                    <i class="pi pi-image" aria-hidden="true"></i>
-                    <span class="sr-only">{{ answer.imageName || 'Add answer image' }}</span>
-                  </label>
-
-                  @if (answer.imagePreview) {
-                    <div class="image-preview image-preview--answer">
-                      <img
-                        [src]="answer.imagePreview"
-                        [alt]="'Answer ' + answer.key + ' image preview'"
-                      />
-                      <button
-                        type="button"
-                        class="image-preview__clear"
-                        (click)="clearAnswerImage(question.id, answer.key)"
-                      >
-                        Remove image
-                      </button>
-                    </div>
-                  }
-                </section>
-              }
-            </div>
-          </article>
-        }
-      </div>
-
-      <div class="composer-footer">
-        <p-button
-          icon="pi pi-plus"
-          styleClass="reset-btn exam-icon-btn"
-          ariaLabel="Add question"
-          title="Add question"
-          (click)="addQuestion()"
-        />
-        <div class="composer-footer__actions">
-          <p-button
-            icon="pi pi-file-pdf"
-            styleClass="reset-btn exam-icon-btn"
-            ariaLabel="Preview PDF"
-            title="Preview PDF"
-            (click)="previewCurrentDraftPdf()"
-          />
-          <p-button
-            icon="pi pi-save"
-            styleClass="reset-btn exam-icon-btn"
-            [ariaLabel]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
-            [title]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
-            (click)="saveExam('Draft')"
-          />
-          <p-button
-            icon="pi pi-check"
-            styleClass="search-btn exam-icon-btn"
-            [ariaLabel]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
-            [title]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
-            (click)="saveExam('Published')"
-          />
+            }
+          </section>
+          }
         </div>
-      </div>
-    </p-card>
-  } @else {
-    <p-confirmDialog styleClass="exam-delete-dialog" />
+      </article>
+      }
+    </div>
 
-    <p-card styleClass="search-card">
-      <div class="search-card__head">
-        <h2>Search Exam</h2>
+    <div class="composer-footer">
+      <p-button icon="pi pi-plus" styleClass="reset-btn exam-icon-btn" ariaLabel="Add question" title="Add question"
+        (click)="addQuestion()" />
+      <div class="composer-footer__actions">
+        <p-button icon="pi pi-file-pdf" styleClass="reset-btn exam-icon-btn" ariaLabel="Preview PDF" title="Preview PDF"
+          (click)="previewCurrentDraftPdf()" />
+        <p-button icon="pi pi-save" styleClass="reset-btn exam-icon-btn"
+          [ariaLabel]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'"
+          [title]="editorMode() === 'edit' ? 'Save changes' : 'Save draft'" (click)="saveExam('Draft')" />
+        <p-button icon="pi pi-check" styleClass="search-btn exam-icon-btn"
+          [ariaLabel]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'"
+          [title]="editorMode() === 'edit' ? 'Update and publish' : 'Publish exam'" (click)="saveExam('Published')" />
+      </div>
+    </div>
+  </p-card>
+  } @else {
+  <p-confirmDialog styleClass="exam-delete-dialog" />
+
+  <p-card styleClass="search-card">
+    <div class="search-card__head">
+      <h2>Search Exam</h2>
+    </div>
+
+    <div class="search-grid search-grid--exams">
+      <label class="search-field search-field--wide">
+        <span>Search</span>
+        <input pInputText [(ngModel)]="draftKeyword" class="search-input" type="text"
+          placeholder="Title, description, exam code or created by" />
+      </label>
+
+      <label class="search-field">
+        <span>Search by department</span>
+        <p-select [options]="departmentOptions()" optionLabel="label" optionValue="value" [(ngModel)]="draftDepartment"
+          placeholder="All departments" styleClass="search-select" />
+      </label>
+
+      <div class="search-actions">
+        <p-button icon="pi pi-search" styleClass="search-btn exam-icon-btn" ariaLabel="Search exams"
+          title="Search exams" (click)="applyFilters()" />
+        <p-button icon="pi pi-refresh" styleClass="reset-btn exam-icon-btn" severity="secondary" [text]="true"
+          ariaLabel="Reset filters" title="Reset filters" (click)="resetFilters()" />
+      </div>
+    </div>
+  </p-card>
+
+  <p-card styleClass="table-card">
+    <div class="table-card__head table-card__head--split">
+      <div>
+        <h2>Total Exams: {{ filteredExams().length }}</h2>
         <p>
-          Search by title, description, exam code, creator, or department while keeping the current
-          internal dashboard style.
+          @if (userRole() === 'super_admin') {
+          Manage created examinations across all parts.
+          } @else {
+          Manage examinations assigned to your part.
+          }
         </p>
       </div>
 
-      <div class="search-grid search-grid--exams">
-        <label class="search-field search-field--wide">
-          <span>Search</span>
-          <input
-            pInputText
-            [(ngModel)]="draftKeyword"
-            class="search-input"
-            type="text"
-            placeholder="Title, description, exam code or created by"
-          />
-        </label>
+      <div class="table-card__actions">
+        @if (notice()) {
+        <span class="table-card__notice">{{ notice() }}</span>
+        }
 
-        <label class="search-field">
-          <span>Search by department</span>
-          <p-select
-            [options]="departmentOptions()"
-            optionLabel="label"
-            optionValue="value"
-            [(ngModel)]="draftDepartment"
-            placeholder="All departments"
-            styleClass="search-select"
-          />
-        </label>
-
-        <div class="search-actions">
-          <p-button
-            icon="pi pi-search"
-            styleClass="search-btn exam-icon-btn"
-            ariaLabel="Search exams"
-            title="Search exams"
-            (click)="applyFilters()"
-          />
-          <p-button
-            icon="pi pi-refresh"
-            styleClass="reset-btn exam-icon-btn"
-            severity="secondary"
-            [text]="true"
-            ariaLabel="Reset filters"
-            title="Reset filters"
-            (click)="resetFilters()"
-          />
-        </div>
+        @if (userRole() !== 'employee') {
+        <p-button icon="pi pi-plus" styleClass="search-btn exam-icon-btn table-card__cta" ariaLabel="Create exam"
+          title="Create exam" (click)="openCreatePage()" />
+        }
       </div>
-    </p-card>
+    </div>
 
-    <p-card styleClass="table-card">
-      <div class="table-card__head table-card__head--split">
-        <div>
-          <h2>Total Exams: {{ filteredExams().length }}</h2>
-          <p>
-            @if (userRole() === 'super_admin') {
-              Manage created examinations across all parts.
+    <p-table [value]="filteredExams()" styleClass="exam-table" [tableStyle]="{ 'min-width': '68rem' }"
+      [paginator]="true" [rows]="5" [rowsPerPageOptions]="rowsPerPageOptions" paginatorDropdownAppendTo="body"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} exams" [showCurrentPageReport]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>No</th>
+          <th>Exam code</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Department</th>
+          <th>Created by</th>
+          <th>Format</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <tr>
+          <td>{{ rowIndex + 1 }}</td>
+          <td>
+            <span class="exam-code">{{ item.code }}</span>
+          </td>
+          <td>
+            <div class="exam-title">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.questionCount }} questions · {{ item.durationMinutes }} mins</span>
+            </div>
+          </td>
+          <td class="exam-description">{{ item.description }}</td>
+          <td>{{ item.department }}</td>
+          <td>{{ item.createdBy }}</td>
+          <td><span class="meta-pill">MCQ Assessment</span></td>
+          <td>
+            <p-tag [value]="item.status" [severity]="statusSeverity(item.status)" />
+          </td>
+          <td>
+            @if (userRole() === 'employee') {
+            <button type="button"
+              class="action-btn action-btn--edit p-button p-component p-button-icon-only p-button-rounded p-button-text"
+              (click)="onStartExam(item)" (click)="onStartExam(item)" title="Bắt đầu làm bài thi"
+              aria-label="Bắt đầu làm bài thi"
+              style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;">
+              <span class="p-button-icon pi pi-play" aria-hidden="true"
+                style="color: #10b981; font-size: 1.2rem;"></span>
+            </button>
             } @else {
-              Manage examinations assigned to your part.
+            <div class="action-group" aria-label="Exam actions"
+              style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
+              <button type="button"
+                class="action-btn action-btn--view p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                (click)="previewExamPdf(item); $event.stopPropagation()" title="Xem trước PDF"
+                aria-label="Xem trước PDF"
+                style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;">
+                <span class="p-button-icon pi pi-file-pdf" aria-hidden="true"
+                  style="color: #3b82f6; font-size: 1.1rem;"></span>
+              </button>
+              <button type="button"
+                class="action-btn action-btn--edit p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                (click)="openEditPage(item); $event.stopPropagation()" title="Chỉnh sửa đề thi"
+                aria-label="Chỉnh sửa đề thi"
+                style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;">
+                <span class="p-button-icon pi pi-pencil" aria-hidden="true"
+                  style="color: #10b981; font-size: 1.1rem;"></span>
+              </button>
+              <button type="button"
+                class="action-btn action-btn--delete p-button p-component p-button-icon-only p-button-rounded p-button-text"
+                (click)="confirmDeleteExam($event, item)" title="Xóa đề thi" aria-label="Xóa đề thi"
+                style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;">
+                <span class="p-button-icon pi pi-trash" aria-hidden="true"
+                  style="color: #ef4444; font-size: 1.1rem;"></span>
+              </button>
+            </div>
             }
-          </p>
-        </div>
+          </td>
+        </tr>
+      </ng-template>
 
-        <div class="table-card__actions">
-          @if (notice()) {
-            <span class="table-card__notice">{{ notice() }}</span>
-          }
-
-          @if (userRole() !== 'employee') {
-            <p-button
-              icon="pi pi-plus"
-              styleClass="search-btn exam-icon-btn table-card__cta"
-              ariaLabel="Create exam"
-              title="Create exam"
-              (click)="openCreatePage()"
-            />
-          }
-        </div>
-      </div>
-
-      <p-table
-        [value]="filteredExams()"
-        styleClass="exam-table"
-        [tableStyle]="{ 'min-width': '68rem' }"
-        [paginator]="true"
-        [rows]="5"
-        [rowsPerPageOptions]="rowsPerPageOptions"
-        paginatorDropdownAppendTo="body"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} exams"
-        [showCurrentPageReport]="true"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>No</th>
-            <th>Exam code</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Department</th>
-            <th>Created by</th>
-            <th>Format</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-          <tr>
-            <td>{{ rowIndex + 1 }}</td>
-            <td>
-              <span class="exam-code">{{ item.code }}</span>
-            </td>
-            <td>
-              <div class="exam-title">
-                <strong>{{ item.title }}</strong>
-                <span>{{ item.questionCount }} questions · {{ item.durationMinutes }} mins</span>
-              </div>
-            </td>
-            <td class="exam-description">{{ item.description }}</td>
-            <td>{{ item.department }}</td>
-            <td>{{ item.createdBy }}</td>
-            <td><span class="meta-pill">MCQ Assessment</span></td>
-            <td>
-              <p-tag [value]="item.status" [severity]="statusSeverity(item.status)" />
-            </td>
-            <td>
-              @if (userRole() === 'employee') {
-                <button
-                  type="button"
-                  class="action-btn action-btn--edit p-button p-component p-button-icon-only p-button-rounded p-button-text"
-                  (click)="onStartExam(item)"
-                  (click)="onStartExam(item)"
-                  title="Bắt đầu làm bài thi"
-                  aria-label="Bắt đầu làm bài thi"
-                  style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
-                >
-                  <span class="p-button-icon pi pi-play" aria-hidden="true" style="color: #10b981; font-size: 1.2rem;"></span>
-                </button>
-              } @else {
-                <div class="action-group" aria-label="Exam actions" style="display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
-                  <button
-                    type="button"
-                    class="action-btn action-btn--view p-button p-component p-button-icon-only p-button-rounded p-button-text"
-                    (click)="previewExamPdf(item); $event.stopPropagation()"
-                    title="Xem trước PDF"
-                    aria-label="Xem trước PDF"
-                    style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
-                  >
-                    <span class="p-button-icon pi pi-file-pdf" aria-hidden="true" style="color: #3b82f6; font-size: 1.1rem;"></span>
-                  </button>
-                  <button
-                    type="button"
-                    class="action-btn action-btn--edit p-button p-component p-button-icon-only p-button-rounded p-button-text"
-                    (click)="openEditPage(item); $event.stopPropagation()"
-                    title="Chỉnh sửa đề thi"
-                    aria-label="Chỉnh sửa đề thi"
-                    style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
-                  >
-                    <span class="p-button-icon pi pi-pencil" aria-hidden="true" style="color: #10b981; font-size: 1.1rem;"></span>
-                  </button>
-                  <button
-                    type="button"
-                    class="action-btn action-btn--delete p-button p-component p-button-icon-only p-button-rounded p-button-text"
-                    (click)="confirmDeleteExam($event, item)"
-                    title="Xóa đề thi"
-                    aria-label="Xóa đề thi"
-                    style="cursor: pointer; border: none; background: transparent; padding: 0.5rem; display: inline-flex; align-items: center; justify-content: center;"
-                  >
-                    <span class="p-button-icon pi pi-trash" aria-hidden="true" style="color: #ef4444; font-size: 1.1rem;"></span>
-                  </button>
-                </div>
-              }
-            </td>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="9">No exams found.</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-card>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9">No exams found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
   }
 </div>

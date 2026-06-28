@@ -58,7 +58,9 @@ interface ParsedPdfExam {
 export class ExamOverviewComponent implements OnInit, OnDestroy {
   readonly exams = input.required<ExamItem[]>();
   readonly userRole = input.required<string>();
+  readonly currentTheme = input<'light' | 'dark'>('dark');
   readonly startExam = output<number>();
+  readonly deleteExamApi = output<number>();
   private readonly confirmationService = inject(ConfirmationService);
 
   protected onStartExam(item: ExamItem): void {
@@ -412,12 +414,12 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
     const currentItem = examId ? this.allExams().find((item) => item.id === examId) ?? null : null;
     const exam = this.buildExamItem(examId ?? 0, this.examDraft(), currentItem?.status ?? 'Draft', currentItem);
 
-    this.openPdfPreview(this.examDraft(), exam);
+    this.openPdfPreview(this.examDraft(), exam, this.currentTheme());
   }
 
   protected previewExamPdf(item: ExamItem): void {
     const draft = this.storedDrafts()[item.id] ?? this.createDraftFromExam(item);
-    this.openPdfPreview(draft, item);
+    this.openPdfPreview(draft, item, this.currentTheme());
   }
 
   protected confirmDeleteExam(event: Event, item: ExamItem): void {
@@ -453,7 +455,10 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
       return nextItems;
     });
 
-    this.notice.set(`The examination "${item.title}" has been removed from the local list.`);
+    // Notify parent to delete in database
+    this.deleteExamApi.emit(item.id);
+
+    this.notice.set(`The examination "${item.title}" has been deleted.`);
   }
 
   protected statusSeverity(status: ExamItem['status']): 'success' | 'warn' | 'secondary' {
@@ -988,7 +993,7 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
     };
   }
 
-  private openPdfPreview(draft: ExamDraft, item: ExamItem): void {
+  private openPdfPreview(draft: ExamDraft, item: ExamItem, theme: 'light' | 'dark'): void {
     const previewWindow = window.open('', '_blank');
 
     if (!previewWindow) {
@@ -1010,7 +1015,7 @@ export class ExamOverviewComponent implements OnInit, OnDestroy {
       })),
     };
 
-    const html = buildExamPreviewHtml(previewDraft, item);
+    const html = buildExamPreviewHtml(previewDraft, item, theme);
     previewWindow.document.open();
     previewWindow.document.write(html);
     previewWindow.document.close();

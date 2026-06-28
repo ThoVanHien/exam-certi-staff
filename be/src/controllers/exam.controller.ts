@@ -1,51 +1,30 @@
-import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
+import { Request, Response, NextFunction } from "express";
 import { ExamService } from "../services/exam.service";
-import { submitExamSchema } from "../validators/exam.validator";
-import type { AuthenticatedRequest } from "../types/express";
+import { StatusCodes } from "http-status-codes";
 
 export class ExamController {
-  static async list(req: Request, res: Response) {
-    const authUser = (req as AuthenticatedRequest).authUser!;
-    const result = await ExamService.getExamsForUser(authUser.role, authUser.department);
-    res.status(StatusCodes.OK).json({
-      success: true,
-      data: result
-    });
+  static async getAllExams(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await ExamService.getAllExams();
+      res.status(StatusCodes.OK).json({
+        success: true,
+        data
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  static async getMyResults(req: Request, res: Response) {
-    const authUser = (req as AuthenticatedRequest).authUser!;
-    const result = await ExamService.getMyResults(authUser.userId);
-    res.status(StatusCodes.OK).json({
-      success: true,
-      data: result
-    });
-  }
-
-  static async getDetail(req: Request, res: Response) {
-    const examId = Number(req.params.examId);
-    const result = await ExamService.getExamForTaking(examId);
-    res.status(StatusCodes.OK).json({
-      success: true,
-      data: result
-    });
-  }
-
-  static async submit(req: Request, res: Response) {
-    const examId = Number(req.params.examId);
-    const payload = submitExamSchema.parse(req.body);
-    const authUser = (req as AuthenticatedRequest).authUser!;
-
-    const result = await ExamService.submitExam({
-      examId,
-      userId: authUser.userId,
-      answers: payload.answers
-    });
-
-    res.status(StatusCodes.OK).json({
-      success: true,
-      data: result
-    });
+  static async deleteExam(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = Number(req.params.id);
+      await ExamService.deleteExam(id);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Exam deleted successfully"
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
